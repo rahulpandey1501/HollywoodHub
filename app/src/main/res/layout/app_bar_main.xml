@@ -1,0 +1,124 @@
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:local="http://schemas.android.com/tools"
+    android:id="@+id/main_content"
+    android:background="@color/colorPrimaryDark"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:elevation="0dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="@color/colorPrimaryDark"
+            app:layout_scrollFlags="scroll|snap|exitUntilCollapsed">
+
+            <ImageView
+                android:id="@+id/backdrop"
+                android:src="@drawable/header_movie"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:focusable="true"
+                android:fitsSystemWindows="true"
+                android:scaleType="centerCrop"
+                app:layout_collapseMode="pin" />
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?actionBarSize"
+                android:contentInsetRight="8dp"
+                local:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                local:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:layout_collapseMode="pin">
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_height="wrap_content">
+                <Spinner
+                    android:id="@+id/spinner_nav"
+                    android:layout_gravity="right"
+                    android:visibility="invisible"
+                    android:popupBackground="@color/colorPrimaryDark"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/genre_iv"
+                        android:layout_width="wrap_content"
+                        android:layout_gravity="right"
+                        android:textSize="38sp"
+                        android:textStyle="bold"
+                        android:elevation="0dp"
+                        android:layout_marginRight="4dp"
+                        android:textColor="@android:color/white"
+                        android:gravity="center"
+                        android:background="@android:color/transparent"
+                        android:layout_height="match_parent"
+                        android:text="..."/>
+                </FrameLayout>
+                </android.support.v7.widget.Toolbar>
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/detail_tabs"
+        android:paddingStart="4dp"
+        app:paddingEnd="4dp"
+        app:tabMode="scrollable"
+        app:tabGravity="fill"
+        style="@style/NavigationTab"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        app:layout_collapseMode="none"
+        app:tabIndicatorColor="@android:color/white"
+        android:layout_gravity="bottom"
+        app:layout_anchor="@id/appbar"
+        app:layout_anchorGravity="bottom"
+        android:background="@color/colorPrimaryDark"
+        app:tabIndicatorHeight="2dp"
+        app:tabSelectedTextColor="#fff"
+        app:tabTextColor="#90ffffff" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="47dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_height="match_parent">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:background="@color/colorPrimaryDark"
+        android:layout_height="wrap_content" />
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="SMART_BANNER"
+        ads:adUnitId="@string/banner_ad_unit_id">
+    </com.google.android.gms.ads.AdView>
+
+</RelativeLayout>
+    <!--<android.support.design.widget.FloatingActionButton-->
+        <!--android:id="@+id/fab"-->
+        <!--app:layout_anchor="@id/appbar"-->
+        <!--app:layout_anchorGravity="bottom|right|end"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content" />-->
+</android.support.design.widget.CoordinatorLayout>

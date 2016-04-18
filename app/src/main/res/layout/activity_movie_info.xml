@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/movie_root_layout"
+    android:orientation="vertical"
+    android:background="@color/colorPrimaryDark"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    android:fitsSystemWindows="true"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.rahul.mymovies.MovieContent">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:background="#90000000"
+        android:visibility="gone"
+        android:id="@+id/view_span_dwnlnk"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:focusable="true"
+        android:paddingTop="20dp"
+        android:layout_above="@+id/adView"
+        android:layout_below="@id/view_span_dwnlnk"
+        android:fadeScrollbars="false"
+        android:background="#90000000"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:id="@+id/movie_layout"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:padding="16dp"
+                android:gravity="center"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:layout_width="200dp"
+                    android:visibility="visible"
+                    android:adjustViewBounds="true"
+                    android:layout_height="wrap_content"
+                    android:scaleType="fitXY"
+                    android:id="@+id/image"/>
+            </LinearLayout>
+            <LinearLayout
+                android:padding="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="23sp"
+                    android:textStyle="bold"
+                    android:textColor="#ffffff"
+                    style="@style/CustomTextShadow"
+                    android:text=""
+                    android:id="@+id/title"/>
+                <RatingBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="?android:attr/ratingBarStyleSmall"
+                    android:id="@+id/ratingBar"
+                    android:visibility="gone"
+                    android:numStars="5"
+                    android:stepSize="0.5"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="12dp"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_weight="1"
+                        android:background="#ffffff"
+                        android:layout_height="1dp">
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/CustomTextShadow"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textAllCaps="true"
+                        android:text="Info"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_weight="1"
+                        android:background="#ffffff"
+                        android:layout_height="1dp">
+                    </LinearLayout>
+
+                </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:textColor="#ffffff"
+                    android:textStyle="bold"
+                    style="@style/CustomTextShadow"
+                    android:text="IMDb: loading ..."
+                    android:id="@+id/rating"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="#ffffff"
+                    style="@style/CustomTextShadow"
+                    android:textStyle="bold"
+                    android:text="Release : loading ..."
+                    android:id="@+id/release"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="#ffffff"
+                    android:textStyle="bold"
+                    style="@style/CustomTextShadow"
+                    android:text="Time : loading ..."
+                    android:id="@+id/duration"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="#ffffff"
+                    style="@style/CustomTextShadow"
+                    android:textStyle="bold"
+                    android:text="Country : loading ..."
+                    android:id="@+id/writer"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="#ffffff"
+                    android:textStyle="bold"
+                    style="@style/CustomTextShadow"
+                    android:text="Genre : loading ..."
+                    android:id="@+id/genre"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="#ffffff"
+                    android:textStyle="bold"
+                    style="@style/CustomTextShadow"
+                    android:layout_height="wrap_content"
+                    android:text="Director : loading ..."
+                    android:id="@+id/director"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="#ffffff"
+                    style="@style/CustomTextShadow"
+                    android:textStyle="bold"
+                    android:text="Cast : loading ..."
+                    android:id="@+id/cast"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="12dp"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_weight="1"
+                        android:background="#ffffff"
+                        android:layout_height="1dp">
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/CustomTextShadow"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textAllCaps="true"
+                        android:text="Story"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_weight="1"
+                        android:background="#ffffff"
+                        android:layout_height="1dp">
+                    </LinearLayout>
+
+                </LinearLayout>
+                <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:textSize="20sp"-->
+                <!--android:layout_marginTop="8dp"-->
+                <!--android:textColor="#ffffff"-->
+                <!--android:textStyle="bold"-->
+                <!--style="@style/CustomTextShadow"-->
+                <!--android:text="Story :-"/>-->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ffffff"
+                    android:textStyle="bold"
+                    android:layout_marginTop="12dp"
+                    style="@style/CustomTextShadow"
+                    android:text="loading ..."
+                    android:id="@+id/story"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:id="@+id/arrow_conatiner_layout"
+                    android:layout_marginTop="12dp"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_weight="1"
+                        android:background="#ffffff"
+                        android:layout_height="1dp">
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/CustomTextShadow"
+                        android:textSize="16sp"
+                        android:textAllCaps="true"
+                        android:textStyle="bold"
+                        android:text="Download Links"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_weight="1"
+                        android:background="#ffffff"
+                        android:layout_height="1dp">
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:id="@+id/tvseries_layout">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        style="@style/CustomTextShadow"
+                        android:layout_marginTop="12dp"
+                        android:text="Select Season :-"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:background="@drawable/rounder_border"
+                        android:layout_marginTop="8dp"
+                        android:layout_height="wrap_content">
+                        <android.support.v7.widget.AppCompatSpinner
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:padding="8dp"
+                            android:backgroundTint="#ffffff"
+                            android:popupBackground="#333333"
+                            android:id="@+id/select_season">
+                        </android.support.v7.widget.AppCompatSpinner>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:layout_marginTop="8dp"
+                        android:textStyle="bold"
+                        style="@style/CustomTextShadow"
+                        android:text="Select Episode :-"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/rounder_border"
+                        android:layout_height="wrap_content">
+                        <android.support.v7.widget.AppCompatSpinner
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            android:backgroundTint="#ffffff"
+                            android:popupBackground="#333333"
+                            android:layout_gravity="center"
+                            android:id="@+id/select_episode">
+                        </android.support.v7.widget.AppCompatSpinner>
+                    </LinearLayout>
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/submitButtonTVSeries"
+                        android:background="@drawable/rounder_border"
+                        android:padding="0dp"
+                        android:layout_marginTop="16dp"
+                        android:text="fetch"
+                        android:layout_gravity="center"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="visible"
+                    android:id="@+id/download_layout">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textStyle="italic"
+                        style="@style/CustomTextShadow"
+                        android:layout_marginTop="12dp"
+                        android:text="Select Server :-"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:background="@drawable/rounder_border"
+                        android:layout_marginTop="12dp"
+                        android:layout_height="wrap_content">
+                        <android.support.v7.widget.AppCompatSpinner
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:padding="8dp"
+                            android:backgroundTint="#ffffff"
+                            android:popupBackground="#333333"
+                            android:id="@+id/select_server">
+                        </android.support.v7.widget.AppCompatSpinner>
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/recycler_progressbar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:indeterminateTint="#FFF"
+                android:visibility="gone"/>
+
+
+            <android.support.v7.widget.RecyclerView
+                android:background="@android:color/transparent"
+                android:layout_marginRight="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                android:id="@+id/recycler_download">
+            </android.support.v7.widget.RecyclerView>
+        </LinearLayout>
+    </ScrollView>
+
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="SMART_BANNER"
+        android:background="#90000000"
+        ads:adUnitId="@string/banner_ad_unit_id">
+    </com.google.android.gms.ads.AdView>
+
+</RelativeLayout>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="2dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/recycler_gridlist"
+        android:layout_height="match_parent">
+        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/card_view"
+            android:focusable="true"
+            app:cardElevation="4dp"
+            app:cardMaxElevation="8dp"
+            app:cardCornerRadius="4dp"
+            app:contentPadding="0dp"
+            android:padding="0dp"
+            android:animateLayoutChanges="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:background="@color/colorPrimaryDark"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_menu_slideshow"
+                    android:id="@+id/movie_IV"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:maxLines="2"
+                    android:minLines="2"
+                    android:visibility="visible"
+                    android:padding="2dp"
+                    android:ellipsize="marquee"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/side_nav_bar"
+                    android:layout_alignParentBottom="true"
+                    android:textColor="@android:color/white"
+                    android:layout_alignBaseline="@+id/movie_IV"
+                    android:id="@+id/movie_title_TV"
+                    android:gravity="center"
+                    android:layout_height="wrap_content" />
+
+            </RelativeLayout>
+            <!--<android.support.v7.widget.CardView-->
+            <!--android:layout_width="match_parent"-->
+            <!--app:cardUseCompatPadding="true"-->
+            <!--app:cardBackgroundColor="@android:color/transparent"-->
+            <!--</android.support.v7.widget.CardView>-->
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">HollywoodHub</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_settings">Settings</string>
+    <string name="vertical_ellipsis">&#8230;</string>
+    <string name="banner_ad_unit_id">ca-app-pub-5057724905062766/9272788137</string>
+
+    <string-array name="genre">
+        <item>All</item>
+        <item>Action</item>
+        <item>Adventure</item>
+        <item>Animation</item>
+        <item>Biography</item>
+        <item>Comedy</item>
+        <item>Crime</item>
+        <item>Documentary</item>
+        <item>Drama</item>
+        <item>Family</item>
+        <item>Fantasy</item>
+        <item>History</item>
+        <item>Horror</item>
+        <item>Mystery</item>
+        <item>Romance</item>
+        <item>Sci-Fi</item>
+        <item>Short</item>
+        <item>Sport</item>
+        <item>Thriller</item>
+        <item>War</item>
+    </string-array>
+    <string name="title_activity_movie_info">MovieInfo</string>
+</resources>

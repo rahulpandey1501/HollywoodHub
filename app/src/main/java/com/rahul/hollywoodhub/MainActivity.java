@@ -68,9 +68,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        System.setProperty("http.proxyHost", "24.205.163.136");
-        System.setProperty("http.proxyPort", "80");
         setContentView(R.layout.activity_main);
         toolbar= (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {

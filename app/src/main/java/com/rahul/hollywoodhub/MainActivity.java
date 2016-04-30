@@ -19,6 +19,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     TextView genreIVButton;
     private static int RESULT_LOAD_IMAGE = 1;
     public static final String SHAREDPREFRENCES_STRING = "SHAREDPREFRENCES_DATA";
-    private String searchQuery="", MOVIE_HEADER_IMAGE="movie_header",TVSERIES_HEADER_IMAGE="movie_tvseries";
+    private String MOVIE_HEADER_IMAGE="movie_header",TVSERIES_HEADER_IMAGE="movie_tvseries";
     static boolean fromMoviePage = true;
     String imgDecodableString;
     Snackbar snack;
@@ -68,13 +69,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        System.setProperty("http.proxyHost", "24.205.163.136");
+        System.setProperty("http.proxyPort", "80");
         setContentView(R.layout.activity_main);
         toolbar= (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
         }
+
+        initializeAd();
+
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
+        mViewPager.setOffscreenPageLimit(0);
         mTabLayout = (TabLayout) findViewById(R.id.detail_tabs);
         genreIVButton = (TextView) findViewById(R.id.genre_iv);
 
@@ -111,10 +118,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position == 0) {
                     collapsingToolbar.setTitle("Hollywood");
-                    getSupportActionBar().setTitle("Hollywood");
                 } else {
-                    collapsingToolbar.setTitle(spinnerAdapter.getItem(position));
-                    getSupportActionBar().setTitle(spinnerAdapter.getItem(position));
+                    collapsingToolbar.setTitle(Html.fromHtml("<small>" + spinnerAdapter.getItem(position) + "</small>"));
                 }
                 setViewPagerAdapter(Constants.GENRE_MAPPING.get(spinnerAdapter.getItem(position)), false);
             }
@@ -147,8 +152,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             }
         });
-
-        initializeAd();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -271,10 +274,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        searchQuery = query.replace(" ", "+");
-        collapsingToolbar.setTitle(query);
-        getSupportActionBar().setTitle(query);
-        setViewPagerAdapter(Constants.MOVIE_SEARCH_PREFIX+searchQuery, true);
+        collapsingToolbar.setTitle(Html.fromHtml("<small>"+query+"</small>"));
+        setViewPagerAdapter(Constants.MOVIE_SEARCH_PREFIX+query.replace(" ", "+"), true);
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
         searchView.onActionViewCollapsed();
@@ -332,25 +333,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         @Override
         public int getCount() {
-            return 5;
+            return Constants.SECTION_MAPPING.size();
         }
 
         @Override
         public String getPageTitle(int position) {
-            switch (position){
-                case 0:
-                    return "Popular";
-                case 1:
-                    return "Most Viewed";
-                case 2:
-                    return "Top IMDB";
-                case 3:
-                    return "Top Rated";
-                case 4:
-                    return "Latest";
-                default:
-                    return "Latest";
-            }
+            return Constants.SECTION_MAPPING.keySet().toArray()[position].toString();
+//            switch (position){
+//                case 0:
+//                    return "Popular";
+//                case 1:
+//                    return "Most Viewed";
+//                case 2:
+//                    return "Top IMDB";
+//                case 3:
+//                    return "Top Rated";
+//                case 4:
+//                    return "Latest";
+//                default:
+//                    return "Latest";
+//            }
         }
     }
     @Override

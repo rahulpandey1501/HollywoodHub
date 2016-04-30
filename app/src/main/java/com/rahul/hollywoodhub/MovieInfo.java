@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -23,8 +22,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -61,6 +61,8 @@ public class MovieInfo extends Activity {
     ProgressBar recyclerProgressbar;
     private ProgressDialog dialog;
     public static String contentTitle;
+    static boolean fetchFromMethod2 = false;
+    private InterstitialAd mInterstitialAd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +76,7 @@ public class MovieInfo extends Activity {
         recyclerView.setHasFixedSize(false);
         recyclerView.setNestedScrollingEnabled(false);
         title.setText(movieData.title);
+        Picasso.with(getApplicationContext()).load((String) getIntent().getExtras().get("image")).into(image);
         Picasso.with(getApplicationContext()).load((String) getIntent().getExtras().get("image")).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom loadedFrom) {
@@ -93,6 +96,11 @@ public class MovieInfo extends Activity {
 
         initializeAd();
 
+        mInterstitialAd.setAdListener(new AdListener() {
+            public void onAdLoaded() {
+                displayInterstitial();
+            }
+        });
         dialog = new ProgressDialog(MovieInfo.this);
         dialog.setTitle((String) getIntent().getExtras().get("title"));
         dialog.setMessage("Please wait while fetching movie data");
@@ -102,11 +110,25 @@ public class MovieInfo extends Activity {
         parserAsyncTask.execute(link);
     }
 
+    @Override
+    public void onBackPressed() {
+        finish();
+        overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
+        super.onBackPressed();
+    }
+
     private void initializeAd() {
-        AdView adView = (AdView) findViewById(R.id.adView);
+        mInterstitialAd = new InterstitialAd(MovieInfo.this);
+        mInterstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_ad_unit_id));
         AdRequest adRequest = new AdRequest.Builder()
                 .build();
-        adView.loadAd(adRequest);
+        mInterstitialAd.loadAd(adRequest);
+    }
+
+    public void displayInterstitial() {
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        }
     }
 
     class ParserAsyncTask extends AsyncTask<String, Void, Boolean> {
@@ -134,12 +156,16 @@ public class MovieInfo extends Activity {
                 int i = 1;
                 for (Element e : elements){
                     for (Element temp : e.select("a")) {
-//                        serverList.put("[Server " + i + "] " + temp.attr("title")
-//                                , Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash")
-//                        );
-                        serverList.put("[Server " + i + "] " + temp.attr("title")
-                                , Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id")
-                        );
+                        if (fetchFromMethod2) {
+                            serverList.put("[Server " + i + "] " + temp.attr("title")
+                                    , Constants.LOAD_EPISODE_PREFIX_1 + temp.attr("episode-id")
+                            );
+                        }
+                        else {
+                            serverList.put("[Server " + i + "] " + temp.attr("title")
+                                    , Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash")
+                            );
+                        }
                     }
                     ++i;
                 }
@@ -147,9 +173,12 @@ public class MovieInfo extends Activity {
                 // CHECK FOR SERVER BACKUP
                 elements = document.getElementsByAttribute("data-episodes");
                 for (Element e : elements){
-//                    serverList.put("[Server "+i+"] Backup", Constants.LOAD_EPISODE_PREFIX+e.attr("data-episodes").split("-")[0]
-//                            +"/"+e.attr("data-episodes").split("-")[1]);
-                    serverList.put("[Server "+i+"] Backup", Constants.LOAD_EPISODE_PREFIX+e.attr("data-episodes"));
+                    if (fetchFromMethod2)
+                        serverList.put("[Server "+i+"] Backup", Constants.LOAD_EPISODE_PREFIX_1+e.attr("data-episodes"));
+                    else {
+                        serverList.put("[Server " + i + "] Backup", Constants.LOAD_EPISODE_PREFIX + e.attr("data-episodes").split("-")[0]
+                                + "/" + e.attr("data-episodes").split("-")[1]);
+                    }
                 }
             }catch (Exception e){
                 runOnUiThread(new Runnable() {
@@ -191,7 +220,9 @@ public class MovieInfo extends Activity {
         private String getTokenEpisodeUrl(Document document) {
             String id[] = link.split("-");
             String token = document.getElementById("mv-info").select("div[player-token]").attr("player-token");
-            return Constants.GET_EPISODES_PREFIX+id[id.length -1];
+            if (token == null || token.isEmpty())
+                fetchFromMethod2 = true;
+            return Constants.GET_EPISODES_PREFIX+id[id.length -1]+token;
         }
 
         private void fetchMovieDetail(Document document) {
@@ -224,9 +255,9 @@ public class MovieInfo extends Activity {
             movieLayout.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.VISIBLE);
             recyclerProgressbar.setVisibility(View.GONE);
-            Picasso.with(getApplicationContext()).load((String)getIntent().getExtras().get("image")).into(image);
             final ArrayAdapter<String> serverAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item);
             serverAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//            serverAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
             for (String key : serverList.keySet()){
                 serverAdapter.add(key);
                 Log.d("server", serverList.get(key));
@@ -295,6 +326,8 @@ public class MovieInfo extends Activity {
             }
             if(downloadList.size() == 0)
                 Toast.makeText(getApplicationContext(), "Link not found try another [Server]", Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(getApplicationContext(), downloadList.size()+" Link(s) found", Toast.LENGTH_SHORT).show();
             adapter = new RecyclerViewAdapter(getApplicationContext(), downloadList, false);
             recyclerView.setAdapter(adapter);
             WrappingLinearLayoutManager layout = new WrappingLinearLayoutManager(getApplicationContext());

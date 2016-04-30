@@ -8,13 +8,15 @@ import java.util.TreeMap;
  * Created by Rahul on 17 Apr 2016.
  */
 public class Constants {
-    public static final String MOVIE_BASE_URL = "http://123movies.to/movie/filter/movie/";
-    public static final String SERIES_BASE_URL = "http://123movies.to/movie/filter/series/";
-    public static final String MOVIE_SEARCH_PREFIX = "http://123movies.to/movie/search/";
-    public static final String LOAD_EPISODE_PREFIX = "http://123movies.to/ajax/movie_load_episode/";
-    public static final String GET_EPISODES_PREFIX = "http://123movies.to/ajax/movie_get_episodes/";
+    public static final String MOVIE_BASE_URL = "http://123movies.ru/movie/filter/movie/";
+    public static final String SERIES_BASE_URL = "http://123movies.ru/movie/filter/series/";
+    public static final String MOVIE_SEARCH_PREFIX = "http://123movies.ru/movie/search/";
+    public static final String LOAD_EPISODE_PREFIX_1 = "http://123movies.ru/ajax/movie_load_episode/";
+    public static final String GET_EPISODES_PREFIX_1 = "http://123movies.ru/ajax/movie_get_episodes/";
+    public static final String LOAD_EPISODE_PREFIX = "http://123movies.ru/ajax/load_episode/";
+    public static final String GET_EPISODES_PREFIX = "http://123movies.ru/ajax/get_episodes/";
     public static final String SHORTEST_API_TOKEN_LINK = "http://sh.st/st/4aac64566051e85abb20f14559036ed9/";
-    public static final String DEFAULT_URL = "http://123movies.to";
+    public static final String DEFAULT_URL = "http://123movies.ru";
     public static final LinkedHashMap<String, String> GENRE_MAPPING, SECTION_MAPPING;
     static
     {
@@ -46,10 +48,11 @@ public class Constants {
         GENRE_MAPPING.put("Thriller", "3");
         GENRE_MAPPING.put("TV Show", "23");
         GENRE_MAPPING.put("War", "22");
-        SECTION_MAPPING.put("Latest", "latest");
+
+        SECTION_MAPPING.put("Popular", "favorite");
         SECTION_MAPPING.put("Most Viewed", "view");
         SECTION_MAPPING.put("Top IMDB", "imdb_mark");
         SECTION_MAPPING.put("Top Rated", "rating");
-        SECTION_MAPPING.put("Popular", "favorite");
+        SECTION_MAPPING.put("Latest", "latest");
     }
 }

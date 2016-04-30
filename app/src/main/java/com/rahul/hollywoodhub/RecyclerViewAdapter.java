@@ -1,11 +1,11 @@
 package com.rahul.hollywoodhub;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.ClipboardManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,6 +62,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     intent.putExtra("image", information.image);
                     intent.putExtra("title", information.title);
                     context.startActivity(intent);
+                    ((Activity) context).overridePendingTransition(R.anim.enter, R.anim.exit);
                 }
             });
         }

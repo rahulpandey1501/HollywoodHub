@@ -2,7 +2,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:local="http://schemas.android.com/tools"
     android:id="@+id/main_content"
-    android:background="@color/colorPrimaryDark"
     xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -74,7 +73,6 @@
 
     <android.support.design.widget.TabLayout
         android:id="@+id/detail_tabs"
-        android:paddingStart="4dp"
         app:paddingEnd="4dp"
         app:tabMode="scrollable"
         app:tabGravity="fill"
@@ -82,11 +80,10 @@
         android:layout_width="match_parent"
         android:layout_height="45dp"
         app:layout_collapseMode="none"
-        app:tabIndicatorColor="@android:color/white"
         android:layout_gravity="bottom"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom"
-        android:background="@color/colorPrimaryDark"
+        android:background="@android:color/transparent"
         app:tabIndicatorHeight="2dp"
         app:tabSelectedTextColor="#fff"
         app:tabTextColor="#90ffffff" />
@@ -100,15 +97,12 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
-        android:background="@color/colorPrimaryDark"
         android:layout_height="wrap_content" />
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
         android:layout_width="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         ads:adSize="SMART_BANNER"
         ads:adUnitId="@string/banner_ad_unit_id">

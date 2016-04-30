@@ -10,7 +10,6 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="#ffffff"
     tools:context="com.rahul.hollywoodhub.SplashScreen">
 
     <ImageView
@@ -32,7 +31,7 @@
         android:text="Hollywood Hub"
         android:layout_marginTop="10dp"
         android:textSize="30sp"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="#2F2F2F"
         android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"/>
 

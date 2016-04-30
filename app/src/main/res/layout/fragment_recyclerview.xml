@@ -18,16 +18,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Swipe down to refresh"
-            android:textColor="#ffffff"
             android:textSize="20sp"/>
     </LinearLayout>
     <android.support.v7.widget.CardView
+        android:layout_marginTop="20dp"
         app:cardUseCompatPadding="true"
         app:cardElevation="8dp"
         app:cardCornerRadius="8dp"
         android:gravity="center"
         android:id="@+id/progress_bar"
-        android:layout_gravity="center"
+        android:layout_gravity="center_horizontal"
         android:animateLayoutChanges="true"
         android:layout_width="wrap_content"
         android:layout_height="80dp">
@@ -36,13 +36,11 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="4dp"
-            android:layout_gravity="center"
             android:orientation="horizontal">
             <ProgressBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="4dp"
-                android:indeterminateTint="@android:color/holo_blue_dark"
                 android:layout_gravity="center_vertical"
                 android:indeterminate="true"/>
             <TextView
@@ -61,7 +59,7 @@
         android:id="@+id/swipeContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView
+        <android.support.v7.widget.RecyclerView
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"

@@ -14,10 +14,10 @@
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        app:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
+        app:theme="@style/Base.ThemeOverlay.AppCompat.Light"
         android:layout_gravity="start"
         android:hapticFeedbackEnabled="true"
-        android:background="@color/colorPrimaryDark"
+        app:itemTextColor="#465767"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer" />

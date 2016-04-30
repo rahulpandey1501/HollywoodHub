@@ -18,9 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
-import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -33,8 +30,7 @@ import java.util.List;
  */
 public class RecyclerViewFragment extends Fragment{
 
-    private ObservableRecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private RecyclerView mRecyclerView;
     private String link;
     private boolean fromSearch;
     private RecyclerViewAdapter adapter;
@@ -69,14 +65,11 @@ public class RecyclerViewFragment extends Fragment{
         super.onViewCreated(view, savedInstanceState);
         link = getArguments().getString("item");
         progressBar = view.findViewById(R.id.progress_bar);
-        mRecyclerView = (ObservableRecyclerView) view.findViewById(R.id.recyclerView);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
         swipeMessage = layout.findViewById(R.id.swipe_message);
         swipeMessage.setVisibility(View.GONE);
-//        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-//        mRecyclerView.setLayoutManager(layoutManager);
-//        mRecyclerView.setHasFixedSize(true);
         initializeRecyclerView();
         isNetworkAvailable();
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -99,12 +92,10 @@ public class RecyclerViewFragment extends Fragment{
         @Override
         protected void onPreExecute() {
             if (!swipeContainer.isRefreshing()) {
-//                progressBar.setAnimation(CustomAnimation.fadeIn(getContext()));
+                progressBar.setAnimation(CustomAnimation.fadeIn(getContext()));
                 progressBar.setVisibility(View.VISIBLE);
                 progressBar.bringToFront();
             }
-//            mRecyclerView.setVisibility(View.GONE);
-//            progressBar.setVisibility(View.VISIBLE);
             previousListCount = list.size();
             super.onPreExecute();
         }
@@ -124,6 +115,8 @@ public class RecyclerViewFragment extends Fragment{
                     information.title = e.select("a").attr("title");
                     information.link = e.select("a").attr("href");
                     information.image = e.select("img").attr("data-original");
+                    if (information.image.contains(".to"))
+                        information.image = information.image.replace(".to", ".ru");
                     list.add(information);
                 }
             }
@@ -137,6 +130,7 @@ public class RecyclerViewFragment extends Fragment{
         protected void onPostExecute(Boolean aBoolean) {
             try {
                 swipeContainer.setRefreshing(false);
+                progressBar.setAnimation(CustomAnimation.fadeOut(getContext()));
                 progressBar.setVisibility(View.GONE);
                 adapter.notifyDataSetChanged();
                 if (list.isEmpty()) {
@@ -148,7 +142,6 @@ public class RecyclerViewFragment extends Fragment{
                     if (pageCount > 1)
                         pageCount--;
                 }
-                progressBar.setVisibility(View.GONE);
                 if (previousListCount != 0)
                     mRecyclerView.smoothScrollToPosition(previousListCount);
                 mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {

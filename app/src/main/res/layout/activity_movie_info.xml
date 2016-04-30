@@ -8,7 +8,6 @@
     android:orientation="vertical"
     android:background="@color/colorPrimaryDark"
     xmlns:ads="http://schemas.android.com/apk/res-auto"
-    android:fitsSystemWindows="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.rahul.mymovies.MovieContent">
 
@@ -340,7 +339,7 @@
                             android:layout_gravity="center"
                             android:padding="8dp"
                             android:backgroundTint="#ffffff"
-                            android:popupBackground="#333333"
+                            android:popupBackground="@color/colorPrimaryDark"
                             android:id="@+id/select_server">
                         </android.support.v7.widget.AppCompatSpinner>
                     </LinearLayout>

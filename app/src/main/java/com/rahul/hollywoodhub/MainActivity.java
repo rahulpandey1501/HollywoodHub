@@ -1,13 +1,17 @@
 package com.rahul.hollywoodhub;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
@@ -19,8 +23,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -31,6 +37,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -43,7 +51,13 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,android.support.v7.widget.SearchView.OnQueryTextListener {
@@ -67,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     boolean doubleBackToExitPressedOnce = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        setTheme(R.style.MyTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar= (Toolbar) findViewById(R.id.toolbar);
@@ -75,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         initializeAd();
+        CheckForUpdate.getStatus(MainActivity.this);
 
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
@@ -190,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             snack = Snackbar.make(drawer, "Press back again to exit", Snackbar.LENGTH_LONG)
                     .setActionTextColor(getResources().getColor(android.R.color.white));
             ViewGroup group = (ViewGroup) snack.getView();
-            group.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            group.setBackgroundColor(getResources().getColor(R.color.accent_color));
             snack.show();
 //            Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
 
@@ -236,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             collapsingToolbar.setTitle("Hollywood");
             spinner.setSelected(false);
             spinner.setSelection(0);
+            setMovieTheme();
             setViewPagerAdapter(Constants.GENRE_MAPPING.get("All"), false);
         } else if (id == R.id.nav_gallery) {
             fromMoviePage = false;
@@ -243,6 +260,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             collapsingToolbar.setTitle("TV Series");
             spinner.setSelected(false);
             spinner.setSelection(0);
+            setTVSeriesTheme();
             setViewPagerAdapter(Constants.GENRE_MAPPING.get("All"), false);
         }else if (id == R.id.nav_share) {
             try {
@@ -267,6 +285,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void setTVSeriesTheme() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(getResources().getColor(R.color.tvseries_color));
+        }
+        collapsingToolbar.setContentScrimColor(getResources().getColor(R.color.tvseries_color));
+        collapsingToolbar.setBackgroundColor(getResources().getColor(R.color.tvseries_color));
+        mTabLayout.setBackgroundColor(getResources().getColor(R.color.tvseries_color));
+    }
+
+    private void setMovieTheme() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        }
+        collapsingToolbar.setContentScrimColor(getResources().getColor(R.color.colorPrimaryDark));
+        collapsingToolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        mTabLayout.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
     }
 
     @Override

@@ -2,6 +2,7 @@
 <FrameLayout
     android:layout_height="match_parent"
     android:layout_width="match_parent"
+    android:paddingEnd="@dimen/gridview_margin"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -40,7 +41,7 @@
             <ProgressBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="4dp"
+                android:padding="6dp"
                 android:layout_gravity="center_vertical"
                 android:indeterminate="true"/>
             <TextView

@@ -10,7 +10,8 @@ import android.widget.LinearLayout;
 
 public class SplashScreen extends AppCompatActivity {
 
-    private static int SPLASH_TIME_OUT = 2400;
+    private static int SPLASH_TIME_OUT = 500;
+//    private static int SPLASH_TIME_OUT = 2400;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

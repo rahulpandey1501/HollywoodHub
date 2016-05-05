@@ -17,6 +17,7 @@ public class Constants {
     public static final String GET_EPISODES_PREFIX = "http://123movies.ru/ajax/get_episodes/";
     public static final String SHORTEST_API_TOKEN_LINK = "http://sh.st/st/4aac64566051e85abb20f14559036ed9/";
     public static final String DEFAULT_URL = "http://123movies.ru";
+    public static final String UPDATE_CHECKER_URL = "http://rahulpandey1501-appupdates.blogspot.in/";
     public static final LinkedHashMap<String, String> GENRE_MAPPING, SECTION_MAPPING;
     static
     {

@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -48,7 +49,7 @@ import java.util.List;
 public class MovieInfo extends Activity {
 
     Information movieData;
-    TextView title, release, duration, genre, story, rating, director, writer, cast;
+    TextView title, release, duration, genre, story, rating, director, writer, cast, serverStatus;
     ImageView image;
     private String link;
     private RecyclerViewAdapter adapter;
@@ -118,10 +119,12 @@ public class MovieInfo extends Activity {
     }
 
     private void initializeAd() {
+        AdView adView = (AdView) findViewById(R.id.adView);
         mInterstitialAd = new InterstitialAd(MovieInfo.this);
         mInterstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_ad_unit_id));
         AdRequest adRequest = new AdRequest.Builder()
                 .build();
+        adView.loadAd(adRequest);
         mInterstitialAd.loadAd(adRequest);
     }
 
@@ -138,6 +141,7 @@ public class MovieInfo extends Activity {
         protected void onPreExecute() {
             downloadList = new ArrayList<>();
             recyclerView.setVisibility(View.INVISIBLE);
+            serverStatus.setVisibility(View.GONE);
             recyclerProgressbar.setVisibility(View.VISIBLE);
             super.onPreExecute();
         }
@@ -226,10 +230,10 @@ public class MovieInfo extends Activity {
         }
 
         private void fetchMovieDetail(Document document) {
-            Element IMDB_info = document.getElementsByClass("mvic-info").first();
-            movieData.story = document.getElementsByClass("desc").text();
+            movieData.story = document.getElementsByClass("mvic-desc").first().getElementsByClass("desc").text();
             if (movieData.story.contains("123Movies"))
                 movieData.story = "Not Available";
+            Element IMDB_info = document.getElementsByClass("mvic-info").first();
             for (Element e : IMDB_info.getElementsByClass("mvici-left").select("p")){
                 if (e.text().contains("Genre"))
                     movieData.genre = e.text();
@@ -324,10 +328,15 @@ public class MovieInfo extends Activity {
                 if (!inf.link.contains(Constants.DEFAULT_URL))
                     downloadList.add(inf);
             }
-            if(downloadList.size() == 0)
-                Toast.makeText(getApplicationContext(), "Link not found try another [Server]", Toast.LENGTH_SHORT).show();
-            else
-                Toast.makeText(getApplicationContext(), downloadList.size()+" Link(s) found", Toast.LENGTH_SHORT).show();
+            if(downloadList.size() == 0) {
+//                Toast.makeText(getApplicationContext(), "Link not found try another [Server]", Toast.LENGTH_SHORT).show();
+                serverStatus.setText("Server seems to be down try another [Server]");
+                serverStatus.setVisibility(View.VISIBLE);
+            }
+            else {
+                serverStatus.setVisibility(View.GONE);
+                Toast.makeText(getApplicationContext(), downloadList.size() + " Link(s) found", Toast.LENGTH_SHORT).show();
+            }
             adapter = new RecyclerViewAdapter(getApplicationContext(), downloadList, false);
             recyclerView.setAdapter(adapter);
             WrappingLinearLayoutManager layout = new WrappingLinearLayoutManager(getApplicationContext());
@@ -377,6 +386,7 @@ public class MovieInfo extends Activity {
         ratingBar = (RatingBar) findViewById(R.id.ratingBar);
         selectServer = (Spinner) findViewById(R.id.select_server);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_download);
+        serverStatus = (TextView) findViewById(R.id.server_status);
         recyclerProgressbar = (ProgressBar) findViewById(R.id.recycler_progressbar);
         LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
         stars.getDrawable(2).setColorFilter(getResources().getColor(R.color.rating), PorterDuff.Mode.SRC_ATOP);

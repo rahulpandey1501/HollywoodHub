@@ -47,7 +47,6 @@
                     android:id="@+id/spinner_nav"
                     android:layout_gravity="right"
                     android:visibility="invisible"
-                    android:popupBackground="@color/colorPrimaryDark"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
                     <TextView
@@ -83,7 +82,7 @@
         android:layout_gravity="bottom"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom"
-        android:background="@android:color/transparent"
+        android:background="@color/colorPrimaryDark"
         app:tabIndicatorHeight="2dp"
         app:tabSelectedTextColor="#fff"
         app:tabTextColor="#90ffffff" />

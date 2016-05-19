@@ -42,24 +42,31 @@ public class CheckForUpdate {
                     JSONObject jsonObject = null;
                     final String URL, VERSION_MESSAGE;
                     String POSITIVE_BUTTON = "";
+                    boolean updateAvailable = false, showMessage = false;
                     try {
                         jsonObject = new JSONObject(json);
                         jsonObject = jsonObject.getJSONObject(mContext.getResources().getString(R.string.app_name));
                         URL = jsonObject.getString("url");
+                        if (!BuildConfig.VERSION_NAME.equals(jsonObject.getString("version")))
+                            updateAvailable = true;
+                        showMessage = jsonObject.getBoolean("show_message");
                         VERSION_MESSAGE = "Current Version :  "+BuildConfig.VERSION_NAME+"\n"+
                                 "Latest Version   :  "+jsonObject.getString("version")+"\n\n";
                         Log.d("version", VERSION_MESSAGE);
-                        if (jsonObject.getBoolean("show_dialog")
-                                && (!BuildConfig.VERSION_NAME.equals(jsonObject.getString("version"))||jsonObject.getString("type").equals("message"))){
+                        if (updateAvailable || showMessage){
                             AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-                            dialog.setTitle(Html.fromHtml("<b><u><big><font color=#ff0000>"+jsonObject.getString("title")
-                                            + "</font></big></u></b>"));
-                            if (!BuildConfig.VERSION_NAME.equals(jsonObject.getString("version"))) {
-                                dialog.setMessage(VERSION_MESSAGE+ jsonObject.getString("message"));
+                            if (updateAvailable) {
+//                                dialog.setTitle(Html.fromHtml("<b><u><big><font color=#ff0000>"+jsonObject.getJSONObject("update").getString("title")
+//                                        + "</font></big></u></b>"));
+                                dialog.setTitle(jsonObject.getJSONObject("update").getString("title"));
+                                dialog.setMessage(VERSION_MESSAGE+ jsonObject.getJSONObject("update").getString("text"));
                                 POSITIVE_BUTTON = "update";
                             }
-                            else if(jsonObject.getString("type").equals("message")){
-                                dialog.setMessage(jsonObject.getString("message"));
+                            else {
+//                                dialog.setTitle(Html.fromHtml("<b><u><big><font color=#ff0000>"+jsonObject.getJSONObject("message").getString("title")
+//                                        + "</font></big></u></b>"));
+                                dialog.setTitle(jsonObject.getJSONObject("message").getString("title"));
+                                dialog.setMessage(jsonObject.getJSONObject("message").getString("text"));
                             }
                             dialog.setPositiveButton(POSITIVE_BUTTON, new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int which) {

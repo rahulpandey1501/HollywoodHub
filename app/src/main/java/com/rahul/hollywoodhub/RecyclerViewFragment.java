@@ -168,7 +168,8 @@ public class RecyclerViewFragment extends Fragment{
         mRecyclerView.setAdapter(adapter);
 //        mRecyclerView.setVisibility(View.VISIBLE);
         int numberOfColumns = 3;
-        mGridLayoutManager = new VarColumnGridLayoutManager(getContext(), 300);
+        mGridLayoutManager = new VarColumnGridLayoutManager(getContext(), 290);
+//        mGridLayoutManager = new GridLayoutManager(getContext(), 3, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mGridLayoutManager);
     }
 

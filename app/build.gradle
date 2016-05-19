@@ -8,8 +8,8 @@ android {
         applicationId "com.rahul.hollywoodhub"
         minSdkVersion 19
         targetSdkVersion 23
-        versionCode 3
-        versionName "2.2.1"
+        versionCode 8
+        versionName "4.0"
     }
     buildTypes {
         release {

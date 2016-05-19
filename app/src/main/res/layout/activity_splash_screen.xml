@@ -29,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Hollywood Hub"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="4dp"
         android:textSize="30sp"
         android:textColor="#2F2F2F"
         android:layout_gravity="center_horizontal"

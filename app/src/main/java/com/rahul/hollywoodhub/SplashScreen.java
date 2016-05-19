@@ -10,7 +10,7 @@ import android.widget.LinearLayout;
 
 public class SplashScreen extends AppCompatActivity {
 
-    private static int SPLASH_TIME_OUT = 500;
+    private static int SPLASH_TIME_OUT = 100;
 //    private static int SPLASH_TIME_OUT = 2400;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,11 +19,10 @@ public class SplashScreen extends AppCompatActivity {
         startAnimation();
     }
     public void startAnimation(){
-        Animation anim = AnimationUtils.loadAnimation(this, R.anim.alpha);
-        anim.reset();
-        LinearLayout l=(LinearLayout) findViewById(R.id.splash_view);
-        l.clearAnimation();
-
+//        Animation anim = AnimationUtils.loadAnimation(this, R.anim.alpha);
+//        anim.reset();
+//        LinearLayout l=(LinearLayout) findViewById(R.id.splash_view);
+//        l.clearAnimation();
 //        l.startAnimation(anim);
 
         new Handler().postDelayed(new Runnable() {

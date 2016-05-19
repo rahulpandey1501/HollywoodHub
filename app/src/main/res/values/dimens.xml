@@ -6,5 +6,5 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="gridview_margin">3dp</dimen>
+    <dimen name="gridview_margin">4dp</dimen>
 </resources>

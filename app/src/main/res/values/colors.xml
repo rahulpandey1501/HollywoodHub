@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FF1D2B</color>
-    <color name="colorPrimaryDark">#FF1D2B</color>
+    <color name="colorPrimary">#181818</color>
+    <color name="colorPrimaryDark">#181818</color>
     <color name="colorAccent">#2A2A2A</color>
     <color name="download_button_color">#2ecc71</color>
-    <color name="tvseries_color">#1ABC28</color>
+    <color name="tvseries_color">#E6482F</color>
 
     <!--<color name="colorPrimary">#E6482F</color>-->
     <!--<color name="colorPrimaryDark">#2A2A2A</color>-->

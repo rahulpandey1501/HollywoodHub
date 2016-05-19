@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -43,39 +44,40 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 public class MovieInfo extends Activity {
 
     Information movieData;
     TextView title, release, duration, genre, story, rating, director, writer, cast, serverStatus;
     ImageView image;
-    private String link;
-    private RecyclerViewAdapter adapter;
-    LinearLayout movieLayout, tvSeriesLayout;
-    View rootLayout;
-    List<Information> downloadList;
-    RecyclerView recyclerView;
+    private String link, streamLink=null;
+    LinearLayout movieLayout, selectEpisodeLayout;
+    View rootLayout, streamLayout;
+    List<Information> downloadList, streamingList;
+    RecyclerView downloadRecyclerView, streamRecyclerView;
     RatingBar ratingBar;
-    Spinner selectServer;
+    Spinner selectServer, selectEpisode;
     ProgressBar recyclerProgressbar;
     private ProgressDialog dialog;
     public static String contentTitle;
     static boolean fetchFromMethod2 = false;
+    boolean isTVSeries = false;
     private InterstitialAd mInterstitialAd;
+    Button fetchButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_info);
         movieData = new Information();
         intializeView();
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-        link = (String) getIntent().getExtras().get("item");
+        link = getIntent().getExtras().get("item")+"watching.html";
         contentTitle = movieData.title = (String) getIntent().getExtras().get("title");
-        recyclerView.setHasFixedSize(false);
-        recyclerView.setNestedScrollingEnabled(false);
+        downloadRecyclerView.setHasFixedSize(false);
+        downloadRecyclerView.setNestedScrollingEnabled(false);
         title.setText(movieData.title);
         Picasso.with(getApplicationContext()).load((String) getIntent().getExtras().get("image")).into(image);
         Picasso.with(getApplicationContext()).load((String) getIntent().getExtras().get("image")).into(new Target() {
@@ -137,10 +139,13 @@ public class MovieInfo extends Activity {
     class ParserAsyncTask extends AsyncTask<String, Void, Boolean> {
 
         LinkedHashMap<String, String> serverList = new LinkedHashMap<>();
+        TreeMap<String, List<String>> serverListTVSeries = new TreeMap<>(new MyComparator());
         @Override
         protected void onPreExecute() {
+            streamingList = new ArrayList<>();
             downloadList = new ArrayList<>();
-            recyclerView.setVisibility(View.INVISIBLE);
+            streamLayout.setVisibility(View.GONE);
+            downloadRecyclerView.setVisibility(View.GONE);
             serverStatus.setVisibility(View.GONE);
             recyclerProgressbar.setVisibility(View.VISIBLE);
             super.onPreExecute();
@@ -149,39 +154,97 @@ public class MovieInfo extends Activity {
         @Override
         protected Boolean doInBackground(String... params) {
             try {
-                Document document = Jsoup.connect(params[0]+"watching.html")
+                Document document = Jsoup.connect(params[0])
                         .timeout(0)
                         .followRedirects(true)
                         .get();
+                checkForTVSeries(document);
                 fetchMovieDetail(document);
                 document = Jsoup.parseBodyFragment(getServerLists(document));
                 Elements elements = document.getElementsByClass("les-content");
-                Log.d("size", elements.size()+"");
                 int i = 1;
                 for (Element e : elements){
                     for (Element temp : e.select("a")) {
                         if (fetchFromMethod2) {
-                            serverList.put("[Server " + i + "] " + temp.attr("title")
-                                    , Constants.LOAD_EPISODE_PREFIX_1 + temp.attr("episode-id")
-                            );
+                            Log.d("method", "from method 2");
+                            if (isTVSeries){
+                                String episodeName = temp.attr("title");
+                                episodeName = episodeName.contains(":")?episodeName.split(":")[0]:episodeName;
+                                if (serverListTVSeries.containsKey(episodeName)) {
+                                    serverListTVSeries.get(episodeName).add(Constants.LOAD_EPISODE_PREFIX_1 + temp.attr("episode-id"));
+                                }
+                                else {
+                                    List<String> tempList = new ArrayList<>();
+                                    tempList.add(Constants.LOAD_EPISODE_PREFIX_1 + temp.attr("episode-id"));
+                                    serverListTVSeries.put(episodeName, tempList);
+                                }
+                            }else {
+                                serverList.put("[Server " + i + "] " + temp.attr("title")
+                                        , Constants.LOAD_EPISODE_PREFIX_1 + temp.attr("episode-id")
+                                );
+                            }
                         }
                         else {
-                            serverList.put("[Server " + i + "] " + temp.attr("title")
-                                    , Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash")
-                            );
+                            if (isTVSeries) {
+                                boolean flag = true;
+                                String checkKey, episodeName = temp.attr("title").trim();
+                                checkKey = episodeName.contains(":")?episodeName.split(":")[0]:episodeName;
+                                checkKey = checkKey.trim();
+                                for (String key: serverListTVSeries.keySet()){
+                                    String currentCheckKey = key.contains(":")?key.split(":")[0]:key;
+                                    currentCheckKey = currentCheckKey.trim();
+                                    if(currentCheckKey.equalsIgnoreCase(checkKey)){
+                                        Log.d("same key", key+"  "+episodeName);
+                                        serverListTVSeries.get(key).add(Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash"));
+                                        List<String> list = serverListTVSeries.remove(key);
+//                                        list.add(Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash"));
+                                        if (episodeName.compareTo(key.trim()) > 0)
+                                            key = episodeName;
+                                        serverListTVSeries.put(key.trim(), list);
+                                        flag = false;
+                                        break;
+                                    }
+                                }
+                                if (flag){
+                                    Log.d("new", episodeName);
+                                    List<String> tempList = new ArrayList<>();
+                                    tempList.add(Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash"));
+                                    serverListTVSeries.put(episodeName, tempList);
+                                }
+//                                if (serverListTVSeries.containsKey(checkKey)) {
+//                                    serverListTVSeries.get(checkKey)
+//                                            .add(Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash"));
+//                                }
+//                                else {
+//                                    List<String> tempList = new ArrayList<>();
+//                                    tempList.add(Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash"));
+//                                    serverListTVSeries.put(checkKey, tempList);
+//                                }
+                            }else {
+                                serverList.put("[Server " + i + "] " + temp.attr("title")
+                                        , Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash")
+                                );
+                                Log.d("server", Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash"));
+                            }
                         }
                     }
                     ++i;
                 }
 
-                // CHECK FOR SERVER BACKUP
+                // CHECK FOR SERVER STREAMING LINK
                 elements = document.getElementsByAttribute("data-episodes");
                 for (Element e : elements){
-                    if (fetchFromMethod2)
-                        serverList.put("[Server "+i+"] Backup", Constants.LOAD_EPISODE_PREFIX_1+e.attr("data-episodes"));
-                    else {
-                        serverList.put("[Server " + i + "] Backup", Constants.LOAD_EPISODE_PREFIX + e.attr("data-episodes").split("-")[0]
-                                + "/" + e.attr("data-episodes").split("-")[1]);
+                    if(!isTVSeries) {
+                        if (fetchFromMethod2) {
+                            streamLink = Constants.LOAD_EPISODE_PREFIX_1 + e.attr("data-episodes");
+                        }
+//                            serverList.put("[Server " + i + "] Streaming Video", Constants.LOAD_EPISODE_PREFIX_1 + e.attr("data-episodes"));
+                        else {
+                            streamLink = Constants.LOAD_EPISODE_PREFIX + e.attr("data-episodes").split("-")[0]
+                                                    + "/" + e.attr("data-episodes").split("-")[1];
+//                            serverList.put("[Server " + i + "] Streaming Video", Constants.LOAD_EPISODE_PREFIX + e.attr("data-episodes").split("-")[0]
+//                                    + "/" + e.attr("data-episodes").split("-")[1]);
+                        }
                     }
                 }
             }catch (Exception e){
@@ -194,6 +257,16 @@ public class MovieInfo extends Activity {
                 e.printStackTrace();
             }
             return  null;
+        }
+
+        private void checkForTVSeries(Document document) {
+            try {
+                if (document.getElementsByClass("breadcrumb").first().text().contains("Series")) {
+                    isTVSeries = true;
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
 
         private String getServerLists(Document document) {
@@ -254,25 +327,68 @@ public class MovieInfo extends Activity {
             }
         }
 
+        class MyComparator implements Comparator<String> {
+            public int compare(String lhs,String rhs) {
+                return Integer.parseInt(lhs.split(" ")[1].replace(":","")) - Integer.parseInt(rhs.split(" ")[1].replace(":",""));
+            }
+        }
+
         @Override
         protected void onPostExecute(Boolean aBoolean) {
+            if (isTVSeries){
+                selectEpisodeLayout.setVisibility(View.VISIBLE);
+//                fetchButton.setVisibility(View.VISIBLE);
+            }else {
+                if (streamLink != null)
+                    new ExtractDownloadLinkAsyncTask().execute(streamLink);
+                selectEpisodeLayout.setVisibility(View.GONE);
+//                fetchButton.setVisibility(View.GONE);
+            }
             movieLayout.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.VISIBLE);
-            recyclerProgressbar.setVisibility(View.GONE);
+//            downloadRecyclerView.setVisibility(View.VISIBLE);
+//            recyclerProgressbar.setVisibility(View.GONE);
             final ArrayAdapter<String> serverAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item);
             serverAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//            serverAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-            for (String key : serverList.keySet()){
-                serverAdapter.add(key);
-                Log.d("server", serverList.get(key));
+            final ArrayAdapter<String> episodeAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item);
+            episodeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            if (isTVSeries) {
+                for (String key : serverListTVSeries.keySet()){
+                    episodeAdapter.add(key);
+                }
+                selectEpisode.setAdapter(episodeAdapter);
+            }else {
+                for (String key : serverList.keySet())
+                    serverAdapter.add(key);
+                selectServer.setAdapter(serverAdapter);
             }
-            selectServer.setAdapter(serverAdapter);
+            selectEpisode.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    serverAdapter.clear();
+                    for (int i=1; i<=serverListTVSeries.get(selectEpisode.getSelectedItem().toString()).size(); ++i)
+                        serverAdapter.add("Try [ Server "+i+" ] ");
+//                    serverAdapter.add("Try [Server "+i+"] "+selectEpisode.getSelectedItem().toString());
+                    selectServer.setAdapter(serverAdapter);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
             selectServer.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     downloadList.clear();
-                    new ExtractDownloadLinkAsyncTask().execute(serverList.get(selectServer.getSelectedItem().toString()));
-                    selectServer.setSelection(selectServer.getSelectedItemPosition(), false);
+                    if (isTVSeries){
+                        new ExtractDownloadLinkAsyncTask().execute(serverListTVSeries
+                                .get(selectEpisode.getSelectedItem().toString())
+                                .get(position)
+                        );
+                    }else {
+                        new ExtractDownloadLinkAsyncTask().execute(serverList.get(selectServer.getSelectedItem().toString()));
+                    }
+                    selectServer.setSelection(position, false);
                 }
 
                 @Override
@@ -283,7 +399,6 @@ public class MovieInfo extends Activity {
             setData();
             if (dialog.isShowing())
                 dialog.dismiss();
-
         }
     }
 
@@ -291,6 +406,7 @@ public class MovieInfo extends Activity {
 
         @Override
         protected void onPreExecute() {
+            serverStatus.setVisibility(View.GONE);
             recyclerProgressbar.setVisibility(View.VISIBLE);
             super.onPreExecute();
         }
@@ -302,6 +418,11 @@ public class MovieInfo extends Activity {
             try {
                 url = new URL(params[0]);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.setRequestProperty("Connection", "keep-alive");
+                urlConnection.setRequestProperty("host", "123movies.ru");
+                urlConnection.setRequestProperty("Referer", link);
+                urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36#4f6c9a");
                 urlConnection.setReadTimeout(0);
                 InputStream in = new BufferedInputStream(urlConnection.getInputStream());
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -318,34 +439,57 @@ public class MovieInfo extends Activity {
         @Override
         protected void onPostExecute(String linkResponse) {
             Document document = Jsoup.parse(linkResponse, "", Parser.xmlParser());
+            boolean streamFlag = false;
             for (Element ee : document.getElementsByAttribute("file")) {
                 Information inf = new Information();
-                if (ee.attr("file").contains(".srt"))
-                    inf.title = "Type: Subtitle";
-                else
-                    inf.title = "Type: ["+ee.attr("type") +"] | Quality: ["+ ee.attr("label")+"]";
-                inf.link = ee.attr("file");
-                if (!inf.link.contains(Constants.DEFAULT_URL))
-                    downloadList.add(inf);
+                inf.contentUrl = link;
+                inf.contentTitle = contentTitle;
+                if (ee.attr("type").equalsIgnoreCase("m3u8")) {
+                    streamFlag = true;
+                    inf.title = "STREAM NOW...";
+                    inf.link = ee.attr("file");
+                    streamingList.add(inf);
+                    setStreamRecylerView();
+                }else if(!streamFlag){
+                    if (ee.attr("file").contains(".srt"))
+                        inf.title = "Type: Subtitle";
+                    else
+                        inf.title = "Type: [" + ee.attr("type") + "] | Quality: [" + ee.attr("label") + "]";
+                    inf.link = ee.attr("file");
+                    if (!inf.link.contains(Constants.DEFAULT_URL))
+                        downloadList.add(inf);
+                }
             }
-            if(downloadList.size() == 0) {
-//                Toast.makeText(getApplicationContext(), "Link not found try another [Server]", Toast.LENGTH_SHORT).show();
-                serverStatus.setText("Server seems to be down try another [Server]");
-                serverStatus.setVisibility(View.VISIBLE);
+            if(!streamFlag) {
+                if (downloadList.isEmpty()) {
+                    serverStatus.setText("Server seems to be down try another [Server]");
+                    serverStatus.setVisibility(View.VISIBLE);
+                } else {
+                    Toast.makeText(getApplicationContext(), downloadList.size() + " Link(s) found", Toast.LENGTH_SHORT).show();
+                    setDownloadsRecylerView();
+                }
+                recyclerProgressbar.setVisibility(View.GONE);
             }
-            else {
-                serverStatus.setVisibility(View.GONE);
-                Toast.makeText(getApplicationContext(), downloadList.size() + " Link(s) found", Toast.LENGTH_SHORT).show();
-            }
-            adapter = new RecyclerViewAdapter(getApplicationContext(), downloadList, false);
-            recyclerView.setAdapter(adapter);
+            super.onPostExecute(linkResponse);
+        }
+
+        private void setDownloadsRecylerView() {
+            downloadRecyclerView.setVisibility(View.VISIBLE);
+            RecyclerViewAdapter adapter = new RecyclerViewAdapter(MovieInfo.this, downloadList, false);
+            downloadRecyclerView.setAdapter(adapter);
             WrappingLinearLayoutManager layout = new WrappingLinearLayoutManager(getApplicationContext());
             layout.setSmoothScrollbarEnabled(true);
-            recyclerView.setLayoutManager(layout);
-            movieLayout.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.VISIBLE);
-            recyclerProgressbar.setVisibility(View.GONE);
-            super.onPostExecute(linkResponse);
+            downloadRecyclerView.setLayoutManager(layout);
+//            movieLayout.setVisibility(View.VISIBLE);
+        }
+
+        private void setStreamRecylerView() {
+            streamLayout.setVisibility(View.VISIBLE);
+            RecyclerViewAdapter adapter = new RecyclerViewAdapter(MovieInfo.this, streamingList, false);
+            streamRecyclerView.setAdapter(adapter);
+            WrappingLinearLayoutManager layout = new WrappingLinearLayoutManager(getApplicationContext());
+            layout.setSmoothScrollbarEnabled(true);
+            streamRecyclerView.setLayoutManager(layout);
         }
     }
 
@@ -382,11 +526,15 @@ public class MovieInfo extends Activity {
         cast = (TextView) findViewById(R.id.cast);
         movieLayout = (LinearLayout) findViewById(R.id.movie_layout);
         rootLayout = findViewById(R.id.movie_root_layout);
-        tvSeriesLayout = (LinearLayout) findViewById(R.id.tvseries_layout);
+        selectEpisodeLayout = (LinearLayout) findViewById(R.id.episode_layout);
         ratingBar = (RatingBar) findViewById(R.id.ratingBar);
         selectServer = (Spinner) findViewById(R.id.select_server);
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_download);
+        fetchButton = (Button) findViewById(R.id.submitButtonTVSeries);
+        selectEpisode = (Spinner) findViewById(R.id.select_episode);
+        downloadRecyclerView = (RecyclerView) findViewById(R.id.recycler_download);
+        streamRecyclerView = (RecyclerView) findViewById(R.id.recycler_streaming);
         serverStatus = (TextView) findViewById(R.id.server_status);
+        streamLayout = findViewById(R.id.streaming_view);
         recyclerProgressbar = (ProgressBar) findViewById(R.id.recycler_progressbar);
         LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
         stars.getDrawable(2).setColorFilter(getResources().getColor(R.color.rating), PorterDuff.Mode.SRC_ATOP);

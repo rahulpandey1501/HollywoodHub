@@ -8,8 +8,7 @@
     android:orientation="vertical"
     android:background="@color/colorPrimaryDark"
     xmlns:ads="http://schemas.android.com/apk/res-auto"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.rahul.mymovies.MovieContent">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <View
         android:layout_width="match_parent"
@@ -215,11 +214,58 @@
                     android:text="loading ..."
                     android:id="@+id/story"/>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:id="@+id/streaming_view"
+                android:orientation="vertical">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:orientation="horizontal"
                     android:gravity="center"
-                    android:id="@+id/arrow_conatiner_layout"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_weight="1"
+                        android:background="#ffffff"
+                        android:layout_height="1dp">
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/CustomTextShadow"
+                        android:textSize="16sp"
+                        android:textAllCaps="true"
+                        android:textStyle="bold"
+                        android:text="Watch Online"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_weight="1"
+                        android:background="#ffffff"
+                        android:layout_height="1dp">
+                    </LinearLayout>
+                </LinearLayout>
+
+                <android.support.v7.widget.RecyclerView
+                    android:background="@android:color/transparent"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                    android:id="@+id/recycler_streaming">
+                </android.support.v7.widget.RecyclerView>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center"
                     android:layout_marginTop="12dp"
                     android:layout_height="wrap_content">
 
@@ -237,7 +283,7 @@
                         android:textSize="16sp"
                         android:textAllCaps="true"
                         android:textStyle="bold"
-                        android:text="Download Links"/>
+                        android:text="Downloads"/>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -247,59 +293,136 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <!--<LinearLayout-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:orientation="vertical"-->
+                    <!--android:visibility="gone">-->
+                    <!--<TextView-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:textSize="16sp"-->
+                        <!--android:textStyle="bold"-->
+                        <!--style="@style/CustomTextShadow"-->
+                        <!--android:layout_marginTop="12dp"-->
+                        <!--android:text="Select Episode :-"/>-->
+
+                    <!--<LinearLayout-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:background="@drawable/rounder_border"-->
+                        <!--android:layout_marginTop="8dp"-->
+                        <!--android:layout_height="wrap_content">-->
+                        <!--<android.support.v7.widget.AppCompatSpinner-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_gravity="center"-->
+                            <!--android:padding="8dp"-->
+                            <!--android:minHeight="32dp"-->
+                            <!--android:backgroundTint="#ffffff"-->
+                            <!--android:popupBackground="#333333"-->
+                            <!--android:id="@+id/select_episode">-->
+                        <!--</android.support.v7.widget.AppCompatSpinner>-->
+                    <!--</LinearLayout>-->
+
+                    <!--<TextView-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:textSize="16sp"-->
+                        <!--android:layout_marginTop="8dp"-->
+                        <!--android:textStyle="bold"-->
+                        <!--style="@style/CustomTextShadow"-->
+                        <!--android:text="Select Server :-"/>-->
+
+                    <!--<LinearLayout-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_marginTop="8dp"-->
+                        <!--android:background="@drawable/rounder_border"-->
+                        <!--android:layout_height="wrap_content">-->
+                        <!--<android.support.v7.widget.AppCompatSpinner-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:padding="8dp"-->
+                            <!--android:minHeight="32dp"-->
+                            <!--android:backgroundTint="#ffffff"-->
+                            <!--android:popupBackground="#333333"-->
+                            <!--android:layout_gravity="center"-->
+                            <!--android:id="@+id/select_server_1">-->
+                        <!--</android.support.v7.widget.AppCompatSpinner>-->
+                    <!--</LinearLayout>-->
+                    <!--<Button-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:id="@+id/submitButtonTVSeries"-->
+                        <!--android:background="@drawable/rounder_border"-->
+                        <!--android:padding="0dp"-->
+                        <!--android:layout_marginTop="16dp"-->
+                        <!--android:text="fetch"-->
+                        <!--android:layout_gravity="center"/>-->
+                <!--</LinearLayout>-->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:visibility="gone"
-                    android:id="@+id/tvseries_layout">
+                    android:visibility="visible"
+                    android:id="@+id/download_layout">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:id="@+id/episode_layout"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:textStyle="normal"
                         style="@style/CustomTextShadow"
                         android:layout_marginTop="12dp"
-                        android:text="Select Season :-"/>
+                        android:text="Select Episode :-"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:background="@drawable/rounder_border"
                         android:layout_marginTop="8dp"
+                        android:visibility="visible"
                         android:layout_height="wrap_content">
                         <android.support.v7.widget.AppCompatSpinner
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:padding="8dp"
+                            android:minHeight="32dp"
                             android:backgroundTint="#ffffff"
-                            android:popupBackground="#333333"
-                            android:id="@+id/select_season">
+                            android:popupBackground="@color/colorAccent"
+                            android:id="@+id/select_episode">
                         </android.support.v7.widget.AppCompatSpinner>
+                    </LinearLayout>
                     </LinearLayout>
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="16sp"
-                        android:layout_marginTop="8dp"
-                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:textStyle="normal"
                         style="@style/CustomTextShadow"
-                        android:text="Select Episode :-"/>
+                        android:layout_marginTop="12dp"
+                        android:text="Select Server :-"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_marginTop="8dp"
                         android:background="@drawable/rounder_border"
+                        android:layout_marginTop="8dp"
                         android:layout_height="wrap_content">
                         <android.support.v7.widget.AppCompatSpinner
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="8dp"
-                            android:backgroundTint="#ffffff"
-                            android:popupBackground="#333333"
                             android:layout_gravity="center"
-                            android:id="@+id/select_episode">
+                            android:padding="8dp"
+                            android:minHeight="32dp"
+                            android:backgroundTint="#ffffff"
+                            android:popupBackground="@color/colorAccent"
+                            android:id="@+id/select_server">
                         </android.support.v7.widget.AppCompatSpinner>
                     </LinearLayout>
                     <Button
@@ -310,42 +433,9 @@
                         android:padding="0dp"
                         android:layout_marginTop="16dp"
                         android:text="fetch"
+                        android:visibility="gone"
                         android:layout_gravity="center"/>
                 </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="visible"
-                    android:id="@+id/download_layout">
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="16sp"
-                        android:textStyle="italic"
-                        style="@style/CustomTextShadow"
-                        android:layout_marginTop="12dp"
-                        android:text="Select Server :-"/>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:background="@drawable/rounder_border"
-                        android:layout_marginTop="12dp"
-                        android:layout_height="wrap_content">
-                        <android.support.v7.widget.AppCompatSpinner
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:padding="8dp"
-                            android:minHeight="32dp"
-                            android:backgroundTint="#ffffff"
-                            android:popupBackground="@color/colorPrimaryDark"
-                            android:id="@+id/select_server">
-                        </android.support.v7.widget.AppCompatSpinner>
-                    </LinearLayout>
-                </LinearLayout>
-
             </LinearLayout>
 
             <ProgressBar

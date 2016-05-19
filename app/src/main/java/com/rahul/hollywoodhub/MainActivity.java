@@ -249,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fromMoviePage = true;
             setHeaderImage(fromMoviePage);
             spinner.setSelection(0);
-            collapsingToolbar.setTitle("Hollywood");
+            collapsingToolbar.setTitle("Movies");
             spinner.setSelected(false);
             spinner.setSelection(0);
             setMovieTheme();

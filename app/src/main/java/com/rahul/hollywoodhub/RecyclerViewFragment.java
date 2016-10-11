@@ -2,6 +2,7 @@ package com.rahul.hollywoodhub;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -166,10 +167,12 @@ public class RecyclerViewFragment extends Fragment{
     private void initializeRecyclerView() {
         adapter = new RecyclerViewAdapter(getContext(), list, true);
         mRecyclerView.setAdapter(adapter);
-//        mRecyclerView.setVisibility(View.VISIBLE);
         int numberOfColumns = 3;
-        mGridLayoutManager = new VarColumnGridLayoutManager(getContext(), 290);
-//        mGridLayoutManager = new GridLayoutManager(getContext(), 3, LinearLayoutManager.VERTICAL, false);
+//        mGridLayoutManager = new VarColumnGridLayoutManager(getContext(), 290);
+        if(getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            numberOfColumns = 4;
+        }
+        mGridLayoutManager = new GridLayoutManager(getContext(), numberOfColumns, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mGridLayoutManager);
     }
 

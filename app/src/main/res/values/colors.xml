@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#181818</color>
-    <color name="colorPrimaryDark">#181818</color>
-    <color name="colorAccent">#2A2A2A</color>
+    <color name="colorPrimary">#E6482F</color>
+    <color name="colorPrimaryDark">#E6482F</color>
+    <color name="colorAccent">#333333</color>
     <color name="download_button_color">#2ecc71</color>
-    <color name="tvseries_color">#E6482F</color>
+    <color name="tvseries_color">#239A77</color>
 
     <!--<color name="colorPrimary">#E6482F</color>-->
     <!--<color name="colorPrimaryDark">#2A2A2A</color>-->
     <!--<color name="colorAccent">#2A2A2A</color>-->
     <color name="rating">#E4BB24</color>
+    <color name="spinner">#E4BB24</color>
 </resources>

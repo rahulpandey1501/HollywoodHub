@@ -105,7 +105,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         final CharSequence options[] = {
                 Html.fromHtml("<b><u><big><font>"+information.contentTitle+"</font></big></u></b>")
                 , Html.fromHtml("<b><big><font color=#808080>Download</font></big></b>")
-                , Html.fromHtml("<b><big><font color=#808080>Copy the link</font></big></b>")
+                , Html.fromHtml("<b><big><font color=#808080>Copy link</font></big></b>")
                 , Html.fromHtml("<b><big><font color=#808080>Share with friends</font></big></b>")
         };
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -149,17 +149,20 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         @Override
         protected String doInBackground(String... params) {
-            try {
-                URL url = new URL(information.link);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.setRequestProperty("Referer", information.contentUrl);
-                urlConnection.setReadTimeout(0);
-                return urlConnection.getHeaderField("Location");
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            return null;
+//            try {
+//                URL url = new URL(information.link);
+//                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+//                urlConnection.setRequestMethod("GET");
+//                urlConnection.setRequestProperty("referer", information.contentUrl);
+//                urlConnection.setRequestProperty("user-agent",
+//                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36");
+//                urlConnection.setReadTimeout(0);
+//                return urlConnection.getHeaderField("location").replace("apm;","");
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
+//            return null;
+            return information.link;
         }
 
         @Override
@@ -167,6 +170,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             progressDialog.dismiss();
             if (!URLUtil.isValidUrl(link))
                 link = information.link;
+            link = link.replace("&amp;", "&");
             switch (request){
                 case DOWNLOAD_REQUEST:
                     openBrowserIntent(link);
@@ -199,8 +203,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             Toast.makeText(mContext, "Link copied to clipboard", Toast.LENGTH_SHORT).show();
         }
     }
-
-
 
     class CustomViewHolder extends RecyclerView.ViewHolder{
         TextView title, dTitle;

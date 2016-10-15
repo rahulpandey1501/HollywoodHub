@@ -19,6 +19,8 @@ public class Constants {
     public static final String DEFAULT_URL = "http://123movies.ru";
     public static final String HOST = "123movies.ru";
     public static final String UPDATE_CHECKER_URL = "http://rahulpandey1501-appupdates.blogspot.in/";
+    public static final String getEpisodePattern1 = "/ajax/v2_get_sources";
+    public static final String getEpisodePattern2 = "/ajax/get_sources";
     public static final LinkedHashMap<String, String> GENRE_MAPPING, SECTION_MAPPING;
     static
     {

@@ -138,7 +138,8 @@ public class MovieInfo extends Activity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                if (url.contains("/ajax/get_source"))
+                Log.d("source url fini", url);
+                if (url.contains(Constants.getEpisodePattern1) || url.equals(Constants.getEpisodePattern2))
                     webView.loadUrl("javascript:window.HTMLOUT.processHTML('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
                 else
                     webView.loadUrl(jsFunc);
@@ -146,13 +147,14 @@ public class MovieInfo extends Activity {
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                Log.d("source url", url);
                 super.onPageStarted(view, url, favicon);
             }
 
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, final String url)
             {
-                if (url.contains("/ajax/get_source") && !receivedUrl) {
+                if ((url.contains(Constants.getEpisodePattern1) || url.equals(Constants.getEpisodePattern2)) && !receivedUrl) {
                     Log.d("source", url);
                     receivedUrl = true;
                     final Handler mainHandler = new Handler(getMainLooper());
@@ -526,6 +528,7 @@ public class MovieInfo extends Activity {
             webView.loadUrl(link);
         receivedUrl = false;
         this.jsFunc = "javascript:" + jsFunc;
+        Log.d("source", jsFunc);
     }
 
     public class ExtractDownloadLinkAsyncTask extends AsyncTask<String, Void, String>{

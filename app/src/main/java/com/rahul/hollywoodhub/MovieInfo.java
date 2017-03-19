@@ -1,5 +1,6 @@
 package com.rahul.hollywoodhub;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
@@ -8,7 +9,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Activity;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -52,8 +52,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class MovieInfo extends Activity {
@@ -61,7 +63,7 @@ public class MovieInfo extends Activity {
     Information movieData;
     TextView title, release, duration, genre, story, rating, director, writer, cast, serverStatus;
     ImageView image;
-    private String link, streamLink=null;
+    private String link, streamLink = null;
     LinearLayout movieLayout, selectEpisodeLayout;
     View rootLayout, streamLayout;
     List<Information> downloadList, streamingList;
@@ -77,8 +79,10 @@ public class MovieInfo extends Activity {
     WebView webView;
     WebViewClient webViewClient;
     Button fetchButton;
-    String jsFunc;
+    String jsFunc, episodeId;
     boolean receivedUrl;
+    Set<String> interceptXHRSet = new HashSet<>();
+    List<String> interceptXHRList = new ArrayList<>();
 
     @JavascriptInterface
     public void processHTML(String html) {
@@ -87,7 +91,14 @@ public class MovieInfo extends Activity {
         Log.d("source", html);
         int start = html.indexOf("{");
         int end = html.lastIndexOf("}");
-        if (start == -1) {
+        if (start == -1 && !interceptXHRList.isEmpty()) {
+            String url = interceptXHRList.remove(interceptXHRList.size() - 1);
+            if (!interceptXHRSet.contains(url)) {
+                receivedUrl = false;
+                interceptXHRSet.add(url);
+                loanUrl(url);
+                return;
+            }
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -98,23 +109,23 @@ public class MovieInfo extends Activity {
             });
             return;
         }
-        String data = html.substring(start, end+1);
+        String data = html.substring(start, end + 1);
         Gson gson = new Gson();
         DownloadModel downloadData = gson.fromJson(data, DownloadModel.class);
         downloadList.clear();
-        for (DownloadModel.DownloadPlaylist.DownloadInfo model :downloadData.getPlaylist().get(0).getSources()) {
+        for (DownloadModel.DownloadPlaylist.DownloadInfo model : downloadData.getPlaylist().get(0).getSources()) {
             Information inf = new Information();
             inf.contentTitle = contentTitle;
             inf.contentUrl = link;
-            inf.link = model.getFile().replace("apm;","");
-            inf.title = "Quality " + model.getType() + " ["+model.getLabel()+"]";
+            inf.link = model.getFile().replace("apm;", "");
+            inf.title = "Quality " + model.getType() + " [" + model.getLabel() + "]";
             downloadList.add(inf);
         }
-        for (DownloadModel.DownloadPlaylist.Subtitle model :downloadData.getPlaylist().get(0).getTracks()) {
+        for (DownloadModel.DownloadPlaylist.Subtitle model : downloadData.getPlaylist().get(0).getTracks()) {
             Information inf = new Information();
             inf.contentTitle = contentTitle;
             inf.contentUrl = link;
-            inf.link = model.getFile().replace("apm;","");
+            inf.link = model.getFile().replace("apm;", "");
             inf.title = "Subtitle [" + model.getLabel() + "]";
             downloadList.add(inf);
         }
@@ -134,12 +145,12 @@ public class MovieInfo extends Activity {
         setContentView(R.layout.activity_movie_info);
         movieData = new Information();
         webView = new WebView(this);
-        webViewClient = new WebViewClient(){
+        webViewClient = new WebViewClient() {
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 Log.d("source url fini", url);
-                if (url.contains(Constants.getEpisodePattern1) || url.equals(Constants.getEpisodePattern2))
+                if ((url.contains(Constants.getEpisodePattern1) || url.contains(Constants.getEpisodePattern2)))
                     webView.loadUrl("javascript:window.HTMLOUT.processHTML('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
                 else
                     webView.loadUrl(jsFunc);
@@ -152,27 +163,17 @@ public class MovieInfo extends Activity {
             }
 
             @Override
-            public WebResourceResponse shouldInterceptRequest(WebView view, final String url)
-            {
-                if ((url.contains(Constants.getEpisodePattern1) || url.equals(Constants.getEpisodePattern2)) && !receivedUrl) {
-                    Log.d("source", url);
-                    receivedUrl = true;
-                    final Handler mainHandler = new Handler(getMainLooper());
-                    Runnable myRunnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            webView.stopLoading();
-                            webView.loadUrl(url);
-                            mainHandler.removeCallbacksAndMessages(null);
-                        }
-                    };
-                    mainHandler.post(myRunnable);
+            public WebResourceResponse shouldInterceptRequest(WebView view, final String url) {
+                if (url.contains(Constants.getEpisodePattern1)) {
+                    interceptXHRList.add(url);
+                    Log.d("source xhr", url);
                 }
+                loanUrl(url);
                 return super.shouldInterceptRequest(view, url);
             }
         };
         intializeView();
-        link = getIntent().getExtras().get("item")+"watching.html";
+        link = getIntent().getExtras().get("item") + "watching.html";
         initializeWebView(link);
         contentTitle = movieData.title = (String) getIntent().getExtras().get("title");
         downloadRecyclerView.setHasFixedSize(false);
@@ -221,6 +222,23 @@ public class MovieInfo extends Activity {
         webView.setWebViewClient(webViewClient);
     }
 
+    private void loanUrl(final String url) {
+        if ((url.contains(Constants.getEpisodePattern1) || url.contains(Constants.getEpisodePattern2)) && !receivedUrl && url.contains(episodeId)) {
+            Log.d("source xhr received", url);
+            receivedUrl = true;
+            final Handler mainHandler = new Handler(getMainLooper());
+            Runnable myRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    webView.stopLoading();
+                    webView.loadUrl(url);
+                    mainHandler.removeCallbacksAndMessages(null);
+                }
+            };
+            mainHandler.post(myRunnable);
+        }
+    }
+
     @Override
     public void onBackPressed() {
         finish();
@@ -248,6 +266,7 @@ public class MovieInfo extends Activity {
 
         LinkedHashMap<String, String> serverList = new LinkedHashMap<>();
         TreeMap<String, List<String>> serverListTVSeries = new TreeMap<>(new MyComparator());
+
         @Override
         protected void onPreExecute() {
             streamingList = new ArrayList<>();
@@ -271,24 +290,23 @@ public class MovieInfo extends Activity {
                 document = Jsoup.parseBodyFragment(getServerLists(document));
                 Elements elements = document.getElementsByClass("les-content");
                 int i = 1;
-                for (Element e : elements){
+                for (Element e : elements) {
                     for (Element temp : e.select("a")) {
                         if (fetchFromMethod2) {
                             Log.d("method", "from method 2");
-                            if (isTVSeries){
+                            if (isTVSeries) {
                                 String episodeName = temp.attr("title");
-                                episodeName = episodeName.contains(":")?episodeName.split(":")[0]:episodeName;
+                                episodeName = episodeName.contains(":") ? episodeName.split(":")[0] : episodeName;
                                 if (serverListTVSeries.containsKey(episodeName)) {
 //                                    serverListTVSeries.get(episodeName).add(Constants.LOAD_EPISODE_PREFIX_1 + temp.attr("episode-id"));
                                     serverListTVSeries.get(episodeName).add(temp.attr("onclick"));
-                                }
-                                else {
+                                } else {
                                     List<String> tempList = new ArrayList<>();
 //                                    tempList.add(Constants.LOAD_EPISODE_PREFIX_1 + temp.attr("episode-id"));
                                     tempList.add(temp.attr("onclick"));
                                     serverListTVSeries.put(episodeName, tempList);
                                 }
-                            }else {
+                            } else {
 //                                sserverList.put("[Server " + i + "] " + temp.attr("title")
 //                                        , Constants.LOAD_EPISODE_PREFIX_1 + temp.attr("episode-id")
 //                                );
@@ -296,18 +314,17 @@ public class MovieInfo extends Activity {
                                         , temp.attr("onclick"));
 
                             }
-                        }
-                        else {
+                        } else {
                             if (isTVSeries) {
                                 boolean flag = true;
                                 String checkKey, episodeName = temp.attr("title").trim();
-                                checkKey = episodeName.contains(":")?episodeName.split(":")[0]:episodeName;
+                                checkKey = episodeName.contains(":") ? episodeName.split(":")[0] : episodeName;
                                 checkKey = checkKey.trim();
-                                for (String key: serverListTVSeries.keySet()){
-                                    String currentCheckKey = key.contains(":")?key.split(":")[0]:key;
+                                for (String key : serverListTVSeries.keySet()) {
+                                    String currentCheckKey = key.contains(":") ? key.split(":")[0] : key;
                                     currentCheckKey = currentCheckKey.trim();
-                                    if(currentCheckKey.equalsIgnoreCase(checkKey)){
-                                        Log.d("same key", key+"  "+episodeName);
+                                    if (currentCheckKey.equalsIgnoreCase(checkKey)) {
+                                        Log.d("same key", key + "  " + episodeName);
                                         serverListTVSeries.get(key).add(Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash"));
                                         List<String> list = serverListTVSeries.remove(key);
 //                                        list.add(Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash"));
@@ -318,7 +335,7 @@ public class MovieInfo extends Activity {
                                         break;
                                     }
                                 }
-                                if (flag){
+                                if (flag) {
                                     Log.d("new", episodeName);
                                     List<String> tempList = new ArrayList<>();
                                     tempList.add(Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash"));
@@ -333,7 +350,7 @@ public class MovieInfo extends Activity {
 //                                    tempList.add(Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash"));
 //                                    serverListTVSeries.put(checkKey, tempList);
 //                                }
-                            }else {
+                            } else {
                                 serverList.put("[Server " + i + "] " + temp.attr("title")
                                         , Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash")
                                 );
@@ -346,21 +363,21 @@ public class MovieInfo extends Activity {
 
                 // CHECK FOR SERVER STREAMING LINK
                 elements = document.getElementsByAttribute("data-episodes");
-                for (Element e : elements){
-                    if(!isTVSeries) {
+                for (Element e : elements) {
+                    if (!isTVSeries) {
                         if (fetchFromMethod2) {
                             streamLink = Constants.LOAD_EPISODE_PREFIX_1 + e.attr("data-episodes");
                         }
 //                            serverList.put("[Server " + i + "] Streaming Video", Constants.LOAD_EPISODE_PREFIX_1 + e.attr("data-episodes"));
                         else {
                             streamLink = Constants.LOAD_EPISODE_PREFIX + e.attr("data-episodes").split("-")[0]
-                                                    + "/" + e.attr("data-episodes").split("-")[1];
+                                    + "/" + e.attr("data-episodes").split("-")[1];
 //                            serverList.put("[Server " + i + "] Streaming Video", Constants.LOAD_EPISODE_PREFIX + e.attr("data-episodes").split("-")[0]
 //                                    + "/" + e.attr("data-episodes").split("-")[1]);
                         }
                     }
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -369,7 +386,7 @@ public class MovieInfo extends Activity {
                 });
                 e.printStackTrace();
             }
-            return  null;
+            return null;
         }
 
         private void checkForTVSeries(Document document) {
@@ -377,7 +394,7 @@ public class MovieInfo extends Activity {
                 if (document.getElementsByClass("breadcrumb").first().text().contains("Series")) {
                     isTVSeries = true;
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -398,21 +415,23 @@ public class MovieInfo extends Activity {
                     result.append(line);
                 }
                 JSONObject jsonObject = new JSONObject(result.toString());
-                domStructure = jsonObject.get("content").toString().replace("\\/", "/").replace("\\\"","").replace("\\n","");
+                domStructure = jsonObject.get("content").toString().replace("\\/", "/").replace("\\\"", "").replace("\\n", "");
             } catch (Exception e) {
                 domStructure = result.toString();
                 e.printStackTrace();
-            }finally {
+            } finally {
                 return domStructure;
             }
         }
 
         private String getTokenEpisodeUrl(Document document) {
-            String id[] = link.split("-");
+//            String id[] = link.split("-");
+            String id = document.getElementsByAttributeValue("name", "movie_id").first().attr("value");
             String token = document.getElementById("mv-info").select("div[player-token]").attr("player-token");
-            if (token == null || token.isEmpty())
-                fetchFromMethod2 = true;
-            return Constants.GET_EPISODES_PREFIX+id[id.length -1]+token;
+//            if (token == null || token.isEmpty())
+            fetchFromMethod2 = true;
+            return Constants.GET_EPISODES_PREFIX + id + token;
+//            return Constants.GET_EPISODES_PREFIX+id[id.length -1]+token;
         }
 
         private void fetchMovieDetail(Document document) {
@@ -420,22 +439,22 @@ public class MovieInfo extends Activity {
             if (movieData.story.contains("123Movies"))
                 movieData.story = "Not Available";
             Element IMDB_info = document.getElementsByClass("mvic-info").first();
-            for (Element e : IMDB_info.getElementsByClass("mvici-left").select("p")){
+            for (Element e : IMDB_info.getElementsByClass("mvici-left").select("p")) {
                 if (e.text().contains("Genre"))
                     movieData.genre = e.text();
-                else if(e.text().contains("Actor"))
+                else if (e.text().contains("Actor"))
                     movieData.stars = e.text();
-                else if(e.text().contains("Director"))
+                else if (e.text().contains("Director"))
                     movieData.director = e.text();
-                else if(e.text().contains("Country"))
+                else if (e.text().contains("Country"))
                     movieData.country = e.text();
             }
-            for (Element e : IMDB_info.getElementsByClass("mvici-right").select("p")){
+            for (Element e : IMDB_info.getElementsByClass("mvici-right").select("p")) {
                 if (e.text().contains("Duration"))
                     movieData.duration = e.text();
-                else if(e.text().contains("Release"))
+                else if (e.text().contains("Release"))
                     movieData.release = e.text();
-                else if(e.text().contains("IMDb"))
+                else if (e.text().contains("IMDb"))
                     movieData.rating = e.text();
             }
         }
@@ -451,13 +470,13 @@ public class MovieInfo extends Activity {
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
-            if (isTVSeries){
+            if (isTVSeries) {
                 selectEpisodeLayout.setVisibility(View.VISIBLE);
 //                fetchButton.setVisibility(View.VISIBLE);
-            }else {
+            } else {
                 if (streamLink != null)
 //                    new ExtractDownloadLinkAsyncTask().execute(streamLink);
-                selectEpisodeLayout.setVisibility(View.GONE);
+                    selectEpisodeLayout.setVisibility(View.GONE);
 //                fetchButton.setVisibility(View.GONE);
             }
             movieLayout.setVisibility(View.VISIBLE);
@@ -468,11 +487,11 @@ public class MovieInfo extends Activity {
             final ArrayAdapter<String> episodeAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item);
             episodeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             if (isTVSeries) {
-                for (String key : serverListTVSeries.keySet()){
+                for (String key : serverListTVSeries.keySet()) {
                     episodeAdapter.add(key);
                 }
                 selectEpisode.setAdapter(episodeAdapter);
-            }else {
+            } else {
                 for (String key : serverList.keySet())
                     serverAdapter.add(key);
                 selectServer.setAdapter(serverAdapter);
@@ -481,8 +500,8 @@ public class MovieInfo extends Activity {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     serverAdapter.clear();
-                    for (int i=1; i<=serverListTVSeries.get(selectEpisode.getSelectedItem().toString()).size(); ++i)
-                        serverAdapter.add("Try [ Server "+i+" ] ");
+                    for (int i = 1; i <= serverListTVSeries.get(selectEpisode.getSelectedItem().toString()).size(); ++i)
+                        serverAdapter.add("Try [ Server " + i + " ] ");
 //                    serverAdapter.add("Try [Server "+i+"] "+selectEpisode.getSelectedItem().toString());
                     selectServer.setAdapter(serverAdapter);
                 }
@@ -496,7 +515,7 @@ public class MovieInfo extends Activity {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     downloadList.clear();
-                    if (isTVSeries){
+                    if (isTVSeries) {
 //                        new ExtractDownloadLinkAsyncTask().execute(serverListTVSeries
 //                                .get(selectEpisode.getSelectedItem().toString())
 //                                .get(position)
@@ -504,7 +523,7 @@ public class MovieInfo extends Activity {
                         extractDataFromWebView(serverListTVSeries.get(selectEpisode.getSelectedItem().toString())
                                 .get(position));
 
-                    }else {
+                    } else {
                         extractDataFromWebView(serverList.get(selectServer.getSelectedItem().toString()));
 //                        new ExtractDownloadLinkAsyncTask().execute(serverList.get(selectServer.getSelectedItem().toString()));
                     }
@@ -528,10 +547,15 @@ public class MovieInfo extends Activity {
             webView.loadUrl(link);
         receivedUrl = false;
         this.jsFunc = "javascript:" + jsFunc;
-        Log.d("source", jsFunc);
+        try {
+            episodeId = jsFunc.substring(jsFunc.indexOf(',') + 1, jsFunc.indexOf(')'));
+        } catch (Exception e) {
+            episodeId = "";
+        }
+        Log.d("source", jsFunc + "  " + episodeId);
     }
 
-    public class ExtractDownloadLinkAsyncTask extends AsyncTask<String, Void, String>{
+    public class ExtractDownloadLinkAsyncTask extends AsyncTask<String, Void, String> {
 
         @Override
         protected void onPreExecute() {
@@ -579,7 +603,7 @@ public class MovieInfo extends Activity {
                     inf.link = ee.attr("file");
                     streamingList.add(inf);
                     setStreamRecylerView();
-                }else if(!streamFlag){
+                } else if (!streamFlag) {
                     if (ee.attr("file").contains(".srt"))
                         inf.title = "Type: Subtitle";
                     else
@@ -589,7 +613,7 @@ public class MovieInfo extends Activity {
                         downloadList.add(inf);
                 }
             }
-            if(!streamFlag) {
+            if (!streamFlag) {
                 if (downloadList.isEmpty()) {
                     serverStatus.setText("Server seems to be down try another [Server]");
                     serverStatus.setVisibility(View.VISIBLE);
@@ -630,8 +654,7 @@ public class MovieInfo extends Activity {
             ratingBar.setVisibility(View.VISIBLE);
             ratingBar.setRating((float) (Float.parseFloat((movieData.rating.split(":")[1]).trim()) / 2.0));
 
-        }
-        else ratingBar.setVisibility(View.GONE);
+        } else ratingBar.setVisibility(View.GONE);
         genre.setText(movieData.genre);
         story.setText(movieData.story);
         if (movieData.director == null)

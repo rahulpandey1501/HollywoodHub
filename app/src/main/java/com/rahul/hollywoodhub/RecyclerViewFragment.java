@@ -117,7 +117,7 @@ public class RecyclerViewFragment extends Fragment{
                     information.link = e.select("a").attr("href");
                     information.image = e.select("img").attr("data-original");
                     if (information.image.contains(".to"))
-                        information.image = information.image.replace(".to", ".ru");
+                        information.image = information.image.replace(".to", ".is");
                     list.add(information);
                 }
             }

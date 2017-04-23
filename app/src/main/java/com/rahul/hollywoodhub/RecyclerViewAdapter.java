@@ -28,9 +28,9 @@ import java.util.List;
  */
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.CustomViewHolder> {
 
-    List<Information> list;
-    Context context;
-    boolean fromMovieInfo;
+    private List<Information> list;
+    private Context context;
+    private boolean fromMovieInfo;
     final static private String DOWNLOAD_REQUEST = "DOWNLOAD_REQUEST", SHARE_REQUEST = "SHARE_REQUEST", COPY_REQUEST = "COPY_REQUEST";
 
     public RecyclerViewAdapter(Context context, List<Information> list, boolean fromMovieInfo) {
@@ -51,8 +51,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_card_small, parent, false);
         else
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.download_list_list, parent, false);
-        CustomViewHolder viewHolder = new CustomViewHolder(view);
-        return viewHolder;
+        return new CustomViewHolder(view);
     }
 
 
@@ -102,7 +101,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private void showDialogOption(final Information information) {
         final CharSequence options[] = {
                 Html.fromHtml("<b><u><big><font>" + information.contentTitle + "</font></big></u></b>")
-                , Html.fromHtml("<b><big><font color=#808080>Download</font></big></b>")
+                , Html.fromHtml("<b><big><font color=#808080>Download/Watch online</font></big></b>")
                 , Html.fromHtml("<b><big><font color=#808080>Copy link</font></big></b>")
                 , Html.fromHtml("<b><big><font color=#808080>Share with friends</font></big></b>")
         };

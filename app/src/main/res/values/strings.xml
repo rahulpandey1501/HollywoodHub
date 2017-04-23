@@ -30,4 +30,16 @@
         <item>War</item>
     </string-array>
     <string name="title_activity_movie_info">MovieInfo</string>
+    <string name="loading">loading...</string>
+    <string name="auth_failed">Authentication Failed</string>
+    <string name="auth_success">Authentication Success</string>
+
+    <style name="o_auth_client_id">
+        337065288268-t7t4msqdf5ra7oeia3h0p8pdq31gs7ps.apps.googleusercontent.com</style>
+
+    <string name="btn_logout_from_google">Logout from Google</string>
+    <string name="btn_revoke_access">Revoke Access</string>
+    <string name="signed_out">Sign Out</string>
+    <string name="google_status_fmt">google status</string>
+    <string name="firebase_status_fmt">firebase status</string>
 </resources>

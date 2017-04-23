@@ -17,8 +17,8 @@ import org.jsoup.nodes.Document;
 /**
  * Created by Rahul on 05 May 2016.
  */
-public class CheckForUpdate {
-    public static void getStatus(final Context mContext){
+class CheckForUpdate {
+    static void getStatus(final Context mContext){
         {
             new AsyncTask<String, Void, String>(){
                 @Override
@@ -56,15 +56,11 @@ public class CheckForUpdate {
                         if (updateAvailable || showMessage){
                             AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
                             if (updateAvailable) {
-//                                dialog.setTitle(Html.fromHtml("<b><u><big><font color=#ff0000>"+jsonObject.getJSONObject("update").getString("title")
-//                                        + "</font></big></u></b>"));
                                 dialog.setTitle(jsonObject.getJSONObject("update").getString("title"));
                                 dialog.setMessage(VERSION_MESSAGE+ jsonObject.getJSONObject("update").getString("text"));
                                 POSITIVE_BUTTON = "update";
                             }
                             else {
-//                                dialog.setTitle(Html.fromHtml("<b><u><big><font color=#ff0000>"+jsonObject.getJSONObject("message").getString("title")
-//                                        + "</font></big></u></b>"));
                                 dialog.setTitle(jsonObject.getJSONObject("message").getString("title"));
                                 dialog.setMessage(jsonObject.getJSONObject("message").getString("text"));
                             }
@@ -77,7 +73,6 @@ public class CheckForUpdate {
                                     })
                                     .setNegativeButton("Dismiss", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int which) {
-//                                        Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT).show();
                                         }
                                     })
                                     .setCancelable(false)

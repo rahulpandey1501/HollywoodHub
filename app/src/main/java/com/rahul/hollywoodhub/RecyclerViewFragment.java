@@ -67,7 +67,7 @@ public class RecyclerViewFragment extends Fragment{
         link = getArguments().getString("item");
         progressBar = view.findViewById(R.id.progress_bar);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-        mRecyclerView.setHasFixedSize(true);
+//        mRecyclerView.setHasFixedSize(true);
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
         swipeMessage = layout.findViewById(R.id.swipe_message);
         swipeMessage.setVisibility(View.GONE);

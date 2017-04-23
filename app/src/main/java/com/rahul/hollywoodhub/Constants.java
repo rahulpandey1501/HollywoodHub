@@ -8,19 +8,21 @@ import java.util.TreeMap;
  * Created by Rahul on 17 Apr 2016.
  */
 public class Constants {
-    public static final String MOVIE_BASE_URL = "https://123movieshd.to/movie/filter/movie/";
-    public static final String SERIES_BASE_URL = "https://123movieshd.to/movie/filter/series/";
-    public static final String MOVIE_SEARCH_PREFIX = "https://123movieshd.to/movie/search/";
-    public static final String LOAD_EPISODE_PREFIX_1 = "https://123movieshd.to/ajax/movie_load_episode/";
-    public static final String GET_EPISODES_PREFIX_1 = "https://123movieshd.to/ajax/movie_get_episodes/";
-    public static final String LOAD_EPISODE_PREFIX = "https://123movieshd.to/ajax/load_episode/";
-    public static final String GET_EPISODES_PREFIX = "https://123movieshd.to/ajax/v2_get_episodes/";
-//    public static final String GET_EPISODES_PREFIX = "https://123movieshd.to/ajax/v2_get_episodes/";
+    public static final String MOVIE_BASE_URL = "https://gomovies.to/movie/filter/movie/";
+    public static final String SERIES_BASE_URL = "https://gomovies.to/movie/filter/series/";
+    public static final String MOVIE_SEARCH_PREFIX = "https://gomovies.to/movie/search/";
+//    public static final String LOAD_EPISODE_PREFIX_1 = "https://gomovies.to/ajax/movie_load_episode/";
+    public static final String GET_EPISODES_PREFIX = "https://gomovies.to/ajax/movie_episodes/";
+    public static final String LOAD_EPISODE_PREFIX_1 = "https://gomovies.to/ajax/movie_load_episode/";
+//    public static final String GET_EPISODES_PREFIX = "https://gomovies.to/ajax/movie_get_episodes/";
+    public static final String LOAD_EPISODE_PREFIX = "https://gomovies.to/ajax/load_episode/";
+//    public static final String GET_EPISODES_PREFIX = "https://gomovies.to/ajax/v2_get_episodes/";
+//    public static final String GET_EPISODES_PREFIX = "https://gomovies.to/ajax/v2_get_episodes/";
     public static final String SHORTEST_API_TOKEN_LINK = "https://sh.st/st/4aac64566051e85abb20f14559036ed9/";
-    public static final String DEFAULT_URL = "https://123movieshd.to";
-    public static final String HOST = "123movieshd.to";
+    public static final String DEFAULT_URL = "https://gomovies.to";
+    public static final String HOST = "gomovies.to";
     public static final String UPDATE_CHECKER_URL = "http://rahulpandey1501-appupdates.blogspot.in/";
-    public static final String getEpisodePattern1 = "_get_sources";
+    public static final String getEpisodePattern1 = "movie_sources";
 //    public static final String getEpisodePattern1 = "/ajax/v3_get_sources";
     public static final String getEpisodePattern2 = "/ajax/get_sources";
     public static final LinkedHashMap<String, String> GENRE_MAPPING, SECTION_MAPPING;

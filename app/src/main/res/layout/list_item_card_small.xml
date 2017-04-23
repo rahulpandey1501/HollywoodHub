@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/recycler_gridlist"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginStart="@dimen/gridview_margin"
     android:layout_marginTop="@dimen/gridview_margin"
     android:orientation="vertical">
@@ -22,9 +22,8 @@
 
     <ImageView
         android:id="@+id/movie_IV"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:adjustViewBounds="true"
         android:scaleType="fitXY"
@@ -34,8 +33,6 @@
         android:id="@+id/movie_title_TV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@+id/movie_IV"
         android:ellipsize="end"
         android:gravity="center"
         android:maxLines="2"

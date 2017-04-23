@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <group android:checkableBehavior="single">
         <item
@@ -30,6 +31,20 @@
                 android:id="@+id/nav_send"
                 android:icon="@drawable/ic_menu_send"
                 android:title="Feedback" />
+        </menu>
+    </item>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/chat_notification_switch"
+                android:icon="@drawable/ic_notifications_black_24dp"
+                android:title="Chat Notification"
+                app:actionLayout="@layout/layout_switch" />
+            <item
+                android:id="@+id/sign_out"
+                android:icon="@drawable/googleg_standard_color_18"
+                android:title="Sign Out" />
         </menu>
     </item>
 

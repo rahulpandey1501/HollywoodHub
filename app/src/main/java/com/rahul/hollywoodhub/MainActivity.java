@@ -1,66 +1,63 @@
 package com.rahul.hollywoodhub;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
-import android.text.Html;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,android.support.v7.widget.SearchView.OnQueryTextListener {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, android.support.v7.widget.SearchView.OnQueryTextListener {
     private Toolbar toolbar;
     private static ImageView header;
     private CollapsingToolbarLayout collapsingToolbar;
@@ -69,9 +66,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TabLayout mTabLayout;
     public Spinner spinner;
     TextView genreIVButton;
+    private FloatingActionButton chatRoom;
     private static int RESULT_LOAD_IMAGE = 1;
     public static final String SHAREDPREFRENCES_STRING = "SHAREDPREFRENCES_DATA";
-    private String MOVIE_HEADER_IMAGE="movie_header",TVSERIES_HEADER_IMAGE="movie_tvseries";
+    private String MOVIE_HEADER_IMAGE = "movie_header", TVSERIES_HEADER_IMAGE = "movie_tvseries";
     static boolean fromMoviePage = true;
     String imgDecodableString;
     Snackbar snack;
@@ -79,25 +77,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public SharedPreferences.Editor sharedPreferencesEditor;
     private android.support.v7.widget.SearchView searchView;
     boolean doubleBackToExitPressedOnce = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        setTheme(R.style.MyTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        toolbar= (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
         }
-
+        startService(new Intent(this, ChatMessageService.class));
         initializeAd();
-        CheckForUpdate.getStatus(MainActivity.this);
+        CheckForUpdate.getStatus(this);
+        Log.d("Firebase", FirebaseInstanceId.getInstance().getToken());
 
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
         mViewPager.setOffscreenPageLimit(0);
         mTabLayout = (TabLayout) findViewById(R.id.detail_tabs);
         genreIVButton = (TextView) findViewById(R.id.genre_iv);
-
         sharedPreferences = this.getSharedPreferences(MainActivity.SHAREDPREFRENCES_STRING, MODE_PRIVATE);
         sharedPreferencesEditor = sharedPreferences.edit();
 
@@ -114,14 +112,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public boolean onLongClick(View v) {
                 sharedPreferencesEditor.clear();
-                sharedPreferencesEditor.commit();
+                sharedPreferencesEditor.apply();
                 setHeaderImage(fromMoviePage);
                 return true;
             }
         });
 
         genreIVButton.setTranslationY(-20f);
-
         spinner = (Spinner) findViewById(R.id.spinner_nav);
         final ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, new ArrayList<>(Constants.GENRE_MAPPING.keySet()));
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -149,7 +146,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 spinner.performClick();
             }
         });
-
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -166,6 +162,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        chatRoom = (FloatingActionButton) findViewById(R.id.fab);
+        chatRoom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, ChatActivity.class));
+            }
+        });
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -174,7 +178,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        ((SwitchCompat)navigationView.getMenu().findItem(R.id.chat_notification_switch).getActionView())
+                .setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                        .edit().putBoolean("chat_notification_enable", isChecked).apply();
+                Log.d("chat", isChecked+"");
+            }
+        });
         setHeaderImage(fromMoviePage);
+        setProfileView();
+    }
+
+    private void setProfileView() {
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View headerView = navigationView.inflateHeaderView(R.layout.nav_header_main);
+        TextView profileName = (TextView) headerView.findViewById(R.id.profileName);
+        ImageView profileImage = (ImageView) headerView.findViewById(R.id.profileImageView);
+        profileName.setText(PreferenceManager.getDefaultSharedPreferences(this).getString("user_name", "HollywoodHub"));
+        Picasso.with(this)
+                .load(PreferenceManager.getDefaultSharedPreferences(this).getString("user_photo", null))
+                .placeholder(R.drawable.header_icon)
+                .transform(new CircleTransform())
+                .into(profileImage);
     }
 
     private void setViewPagerAdapter(String item, boolean fromSearch) {
@@ -196,8 +223,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        }
-        else {
+        } else {
             if (doubleBackToExitPressedOnce) {
                 super.onBackPressed();
                 return;
@@ -206,10 +232,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             snack = Snackbar.make(drawer, "Press back again to exit", Snackbar.LENGTH_LONG)
                     .setActionTextColor(getResources().getColor(android.R.color.white));
             ViewGroup group = (ViewGroup) snack.getView();
-            group.setBackgroundColor(getResources().getColor(R.color.accent_color));
+            group.setBackgroundColor(getResources().getColor(R.color.colorAccent));
             snack.show();
-//            Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
-
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -262,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             spinner.setSelection(0);
             setTVSeriesTheme();
             setViewPagerAdapter(Constants.GENRE_MAPPING.get("All"), false);
-        }else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_share) {
             try {
                 PackageManager pm = getPackageManager();
                 ApplicationInfo ai = pm.getApplicationInfo(getPackageName(), 0);
@@ -276,10 +300,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Log.e("ShareApp", e.getMessage());
             }
         } else if (id == R.id.nav_send) {
-            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","rahulpandey1501@gmail.com", null));
+            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "rahulpandey1501@gmail.com", null));
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Feedback -Hollywood Hub");
             emailIntent.putExtra(Intent.EXTRA_TEXT, "");
             startActivity(Intent.createChooser(emailIntent, "Send email using..."));
+        } else if (id == R.id.sign_out) {
+            FirebaseAuth.getInstance().signOut();
+            startActivity(new Intent(this, GoogleSignInActivity.class));
+            finish();
+        } else if (id == R.id.chat_notification_switch) {
+            ((SwitchCompat) item.getActionView()).toggle();
+            return true;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -311,8 +342,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        collapsingToolbar.setTitle(Html.fromHtml("<small>"+query+"</small>"));
-        setViewPagerAdapter(Constants.MOVIE_SEARCH_PREFIX+query.replace(" ", "+"), true);
+        collapsingToolbar.setTitle(Html.fromHtml("<small>" + query + "</small>"));
+        setViewPagerAdapter(Constants.MOVIE_SEARCH_PREFIX + query.replace(" ", "+"), true);
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
         searchView.onActionViewCollapsed();
@@ -332,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else {
                 Picasso.with(MainActivity.this).load(R.drawable.header_movie).into(header);
             }
-        }else{
+        } else {
             String header_image = sharedPreferences.getString(TVSERIES_HEADER_IMAGE, "false");
             if (!header_image.equalsIgnoreCase("false") && new File(header_image).exists()) {
                 Picasso.with(MainActivity.this).load(new File(header_image)).into(header);
@@ -342,10 +373,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    class TabPagerAdapter extends FragmentStatePagerAdapter{
+    class TabPagerAdapter extends FragmentStatePagerAdapter {
 
         String item;
         boolean fromSearch = false;
+
         public TabPagerAdapter(FragmentManager fm, String item, boolean fromSearch) {
             super(fm);
             this.fromSearch = fromSearch;
@@ -392,11 +424,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            }
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         try {
-            if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null){
+            if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
                 Uri selectedImage = data.getData();
                 String[] filePathColumn = {MediaStore.Images.Media.DATA};
                 Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
@@ -415,11 +448,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 header.setImageBitmap(BitmapFactory
                         .decodeFile(imgDecodableString));
-            }else {
+            } else {
                 Toast.makeText(this, "You haven't picked Image",
                         Toast.LENGTH_LONG).show();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }

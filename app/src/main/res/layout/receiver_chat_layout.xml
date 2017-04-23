@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/receiver_chat"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/layout1"
+    android:visibility="gone"
+    android:layout_marginTop="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/chat_layout"
+        android:layout_marginTop="-12dp"
+        android:layout_below="@+id/receiver_user_name_TV"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/receiver_chat_IV"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/header_icon" />
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginRight="-15dp"
+            android:layout_marginTop="11dp"
+            android:src="@drawable/arrow_bg2" />
+
+        <TextView
+            android:id="@+id/receiver_message_TV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_corner1"
+            android:padding="8dp"
+            android:text="Android charting a "
+            android:textColor="#000" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/receiver_time_TV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/chat_layout"
+        android:textColor="#C2C2C2"
+        android:textSize="12sp"
+        android:layout_alignParentEnd="true"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/receiver_user_name_TV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rahul Pandey"
+        android:textColor="#C2C2C2"
+        android:layout_marginLeft="52dp"
+        android:layout_alignParentTop="true" />
+
+</RelativeLayout>

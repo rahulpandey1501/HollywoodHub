@@ -108,10 +108,13 @@
     </com.google.android.gms.ads.AdView>
 
 </RelativeLayout>
-    <!--<android.support.design.widget.FloatingActionButton-->
-        <!--android:id="@+id/fab"-->
-        <!--app:layout_anchor="@id/appbar"-->
-        <!--app:layout_anchorGravity="bottom|right|end"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content" />-->
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_margin="8dp"
+        android:layout_gravity="bottom|right"
+        app:layout_anchorGravity="bottom|right|end"
+        android:layout_width="wrap_content"
+        android:src="@drawable/ic_chat_black_24dp"
+        android:tint="@android:color/white"
+        android:layout_height="wrap_content" />
 </android.support.design.widget.CoordinatorLayout>

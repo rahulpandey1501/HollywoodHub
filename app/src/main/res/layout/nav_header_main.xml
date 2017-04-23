@@ -7,12 +7,13 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
+    android:id="@+id/profile_view"
     android:background="@color/colorAccent"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/profileImageView"
         android:layout_width="80dp"
         android:adjustViewBounds="true"
         android:layout_height="wrap_content"
@@ -24,6 +25,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:textSize="15sp"
+        android:id="@+id/profileName"
         android:text="Hollywood Hub"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 

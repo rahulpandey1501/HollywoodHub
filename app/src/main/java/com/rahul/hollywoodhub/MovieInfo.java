@@ -10,6 +10,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -164,7 +165,7 @@ public class MovieInfo extends Activity {
 
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, final String url) {
-                if (url.contains(Constants.getEpisodePattern1)) {
+                if (url.contains(Constants.GET_EPISODES_PREFIX)) {
                     interceptXHRList.add(url);
                     Log.d("source xhr", url);
                 }
@@ -262,7 +263,7 @@ public class MovieInfo extends Activity {
         }
     }
 
-    class ParserAsyncTask extends AsyncTask<String, Void, Boolean> {
+    private class ParserAsyncTask extends AsyncTask<String, Void, Boolean> {
 
         LinkedHashMap<String, String> serverList = new LinkedHashMap<>();
         TreeMap<String, List<String>> serverListTVSeries = new TreeMap<>(new MyComparator());
@@ -298,21 +299,15 @@ public class MovieInfo extends Activity {
                                 String episodeName = temp.attr("title");
                                 episodeName = episodeName.contains(":") ? episodeName.split(":")[0] : episodeName;
                                 if (serverListTVSeries.containsKey(episodeName)) {
-//                                    serverListTVSeries.get(episodeName).add(Constants.LOAD_EPISODE_PREFIX_1 + temp.attr("episode-id"));
                                     serverListTVSeries.get(episodeName).add(temp.attr("onclick"));
                                 } else {
                                     List<String> tempList = new ArrayList<>();
-//                                    tempList.add(Constants.LOAD_EPISODE_PREFIX_1 + temp.attr("episode-id"));
-                                    tempList.add(temp.attr("onclick"));
+                                    tempList.add(temp.attr("id"));
                                     serverListTVSeries.put(episodeName, tempList);
                                 }
                             } else {
-//                                sserverList.put("[Server " + i + "] " + temp.attr("title")
-//                                        , Constants.LOAD_EPISODE_PREFIX_1 + temp.attr("episode-id")
-//                                );
                                 serverList.put("[Server " + i + "] " + temp.attr("title")
-                                        , temp.attr("onclick"));
-
+                                        , temp.attr("id"));
                             }
                         } else {
                             if (isTVSeries) {
@@ -325,9 +320,8 @@ public class MovieInfo extends Activity {
                                     currentCheckKey = currentCheckKey.trim();
                                     if (currentCheckKey.equalsIgnoreCase(checkKey)) {
                                         Log.d("same key", key + "  " + episodeName);
-                                        serverListTVSeries.get(key).add(Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash"));
+                                        serverListTVSeries.get(key).add(temp.attr("id"));
                                         List<String> list = serverListTVSeries.remove(key);
-//                                        list.add(Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash"));
                                         if (episodeName.compareTo(key.trim()) > 0)
                                             key = episodeName;
                                         serverListTVSeries.put(key.trim(), list);
@@ -341,18 +335,9 @@ public class MovieInfo extends Activity {
                                     tempList.add(Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash"));
                                     serverListTVSeries.put(episodeName, tempList);
                                 }
-//                                if (serverListTVSeries.containsKey(checkKey)) {
-//                                    serverListTVSeries.get(checkKey)
-//                                            .add(Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash"));
-//                                }
-//                                else {
-//                                    List<String> tempList = new ArrayList<>();
-//                                    tempList.add(Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash"));
-//                                    serverListTVSeries.put(checkKey, tempList);
-//                                }
                             } else {
                                 serverList.put("[Server " + i + "] " + temp.attr("title")
-                                        , Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash")
+                                        , temp.attr("id")
                                 );
                                 Log.d("server", Constants.LOAD_EPISODE_PREFIX + temp.attr("episode-id") + "/" + temp.select("a").attr("hash"));
                             }
@@ -367,13 +352,9 @@ public class MovieInfo extends Activity {
                     if (!isTVSeries) {
                         if (fetchFromMethod2) {
                             streamLink = Constants.LOAD_EPISODE_PREFIX_1 + e.attr("data-episodes");
-                        }
-//                            serverList.put("[Server " + i + "] Streaming Video", Constants.LOAD_EPISODE_PREFIX_1 + e.attr("data-episodes"));
-                        else {
+                        } else {
                             streamLink = Constants.LOAD_EPISODE_PREFIX + e.attr("data-episodes").split("-")[0]
                                     + "/" + e.attr("data-episodes").split("-")[1];
-//                            serverList.put("[Server " + i + "] Streaming Video", Constants.LOAD_EPISODE_PREFIX + e.attr("data-episodes").split("-")[0]
-//                                    + "/" + e.attr("data-episodes").split("-")[1]);
                         }
                     }
                 }
@@ -400,6 +381,7 @@ public class MovieInfo extends Activity {
         }
 
         private String getServerLists(Document document) {
+            Log.d("link", "into server list");
             StringBuilder result = new StringBuilder();
             URL url = null;
             String domStructure = "";
@@ -415,7 +397,7 @@ public class MovieInfo extends Activity {
                     result.append(line);
                 }
                 JSONObject jsonObject = new JSONObject(result.toString());
-                domStructure = jsonObject.get("content").toString().replace("\\/", "/").replace("\\\"", "").replace("\\n", "");
+                domStructure = jsonObject.get("html").toString().replace("\\/", "/").replace("\\\"", "").replace("\\n", "");
             } catch (Exception e) {
                 domStructure = result.toString();
                 e.printStackTrace();
@@ -425,13 +407,18 @@ public class MovieInfo extends Activity {
         }
 
         private String getTokenEpisodeUrl(Document document) {
-//            String id[] = link.split("-");
-            String id = document.getElementsByAttributeValue("name", "movie_id").first().attr("value");
-            String token = document.getElementById("mv-info").select("div[player-token]").attr("player-token");
-//            if (token == null || token.isEmpty())
-            fetchFromMethod2 = true;
-            return Constants.GET_EPISODES_PREFIX + id + token;
-//            return Constants.GET_EPISODES_PREFIX+id[id.length -1]+token;
+            String url = "";
+            try {
+                String id = document.getElementsByAttributeValue("name", "movie_id").first().attr("value");
+                String token = document.getElementById("mv-info").select("div[player-token]").attr("player-token");
+                fetchFromMethod2 = true;
+                url = Constants.GET_EPISODES_PREFIX + id + token;
+            } catch (Exception e) {
+                String[] arraySplit = link.split("-");
+                url = Constants.GET_EPISODES_PREFIX + arraySplit[arraySplit.length - 1].split("/")[0];
+            }
+            Log.d("episode 2", url);
+            return url;
         }
 
         private void fetchMovieDetail(Document document) {
@@ -472,16 +459,11 @@ public class MovieInfo extends Activity {
         protected void onPostExecute(Boolean aBoolean) {
             if (isTVSeries) {
                 selectEpisodeLayout.setVisibility(View.VISIBLE);
-//                fetchButton.setVisibility(View.VISIBLE);
             } else {
                 if (streamLink != null)
-//                    new ExtractDownloadLinkAsyncTask().execute(streamLink);
                     selectEpisodeLayout.setVisibility(View.GONE);
-//                fetchButton.setVisibility(View.GONE);
             }
             movieLayout.setVisibility(View.VISIBLE);
-//            downloadRecyclerView.setVisibility(View.VISIBLE);
-//            recyclerProgressbar.setVisibility(View.GONE);
             final ArrayAdapter<String> serverAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item);
             serverAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             final ArrayAdapter<String> episodeAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item);
@@ -516,18 +498,12 @@ public class MovieInfo extends Activity {
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     downloadList.clear();
                     if (isTVSeries) {
-//                        new ExtractDownloadLinkAsyncTask().execute(serverListTVSeries
-//                                .get(selectEpisode.getSelectedItem().toString())
-//                                .get(position)
-//                        );
                         extractDataFromWebView(serverListTVSeries.get(selectEpisode.getSelectedItem().toString())
                                 .get(position));
 
                     } else {
                         extractDataFromWebView(serverList.get(selectServer.getSelectedItem().toString()));
-//                        new ExtractDownloadLinkAsyncTask().execute(serverList.get(selectServer.getSelectedItem().toString()));
                     }
-//                    selectServer.setSelection(position, false);
                 }
 
                 @Override
@@ -541,18 +517,19 @@ public class MovieInfo extends Activity {
         }
     }
 
-    private void extractDataFromWebView(String jsFunc) {
+    private void extractDataFromWebView(String elementId) {
+        String jsFunction = "document.querySelector('#" + elementId +"').click()";
         recyclerProgressbar.setVisibility(View.VISIBLE);
         if (!webView.getUrl().contains("watching.html"))
             webView.loadUrl(link);
         receivedUrl = false;
-        this.jsFunc = "javascript:" + jsFunc;
+        this.jsFunc = "javascript:" + jsFunction;
         try {
-            episodeId = jsFunc.substring(jsFunc.indexOf(',') + 1, jsFunc.indexOf(')'));
+            episodeId = elementId.split("-")[1];
         } catch (Exception e) {
             episodeId = "";
         }
-        Log.d("source", jsFunc + "  " + episodeId);
+        Log.d("source extra", elementId + "  " + episodeId);
     }
 
     public class ExtractDownloadLinkAsyncTask extends AsyncTask<String, Void, String> {
@@ -640,9 +617,10 @@ public class MovieInfo extends Activity {
         downloadRecyclerView.setVisibility(View.VISIBLE);
         RecyclerViewAdapter adapter = new RecyclerViewAdapter(MovieInfo.this, downloadList, false);
         downloadRecyclerView.setAdapter(adapter);
-        WrappingLinearLayoutManager layout = new WrappingLinearLayoutManager(getApplicationContext());
-        layout.setSmoothScrollbarEnabled(true);
-        downloadRecyclerView.setLayoutManager(layout);
+//        WrappingLinearLayoutManager layout = new WrappingLinearLayoutManager(getApplicationContext());
+//        layout.setSmoothScrollbarEnabled(true);
+        downloadRecyclerView.setNestedScrollingEnabled(false);
+        downloadRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         movieLayout.setVisibility(View.VISIBLE);
     }
 

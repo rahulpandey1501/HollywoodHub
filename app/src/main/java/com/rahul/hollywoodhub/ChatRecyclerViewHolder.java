@@ -13,7 +13,7 @@ import com.squareup.picasso.Picasso;
  * Created by root on 4/23/17.
  */
 
-class ChatRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+public class ChatRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
     private View mView;
     private Context mContext;
@@ -31,13 +31,15 @@ class ChatRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnC
         TextView messageTextView, timeTextView, userNameTextView;
 
         if (currentUser) {
-            layout = (RelativeLayout) mView.findViewById(R.id.sender_chat);
+            mView.findViewById(R.id.sender_chat).setVisibility(View.VISIBLE);
+            mView.findViewById(R.id.receiver_chat).setVisibility(View.GONE);
             chatImageView = (ImageView) mView.findViewById(R.id.sender_chat_IV);
             messageTextView = (TextView) mView.findViewById(R.id.sender_message_TV);
             timeTextView = (TextView) mView.findViewById(R.id.sender_time_TV);
             userNameTextView = (TextView) mView.findViewById(R.id.sender_user_name_TV);
         } else {
-            layout = (RelativeLayout) mView.findViewById(R.id.receiver_chat);
+            mView.findViewById(R.id.sender_chat).setVisibility(View.GONE);
+            mView.findViewById(R.id.receiver_chat).setVisibility(View.VISIBLE);
             chatImageView = (ImageView) mView.findViewById(R.id.receiver_chat_IV);
             messageTextView = (TextView) mView.findViewById(R.id.receiver_message_TV);
             timeTextView = (TextView) mView.findViewById(R.id.receiver_time_TV);
@@ -50,7 +52,6 @@ class ChatRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnC
                 .placeholder(R.drawable.header_icon)
                 .into(chatImageView);
 
-        layout.setVisibility(View.VISIBLE);
         userNameTextView.setText(chatModel.getUserName());
         timeTextView.setText(Utility.getDateString(chatModel.getTime()));
         messageTextView.setText(chatModel.getMessage());

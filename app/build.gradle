@@ -8,8 +8,8 @@ android {
         applicationId "com.rahul.hollywoodhub"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 20
-        versionName "4.5.0"
+        versionCode 24
+        versionName "4.5.3"
     }
     buildTypes {
         release {
@@ -35,7 +35,6 @@ dependencies {
     compile 'com.google.android.gms:play-services-auth:10.2.1'
     compile 'com.squareup.picasso:picasso:2.5.0'
     compile 'com.google.firebase:firebase-database:10.2.1'
-    compile 'com.google.firebase:firebase-storage:10.2.1'
     compile 'com.firebaseui:firebase-ui-database:1.2.0'
     testCompile 'junit:junit:4.12'
 }

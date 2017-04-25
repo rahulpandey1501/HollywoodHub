@@ -47,7 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/chat_layout"
         android:textColor="#C2C2C2"
-        android:textSize="12sp"
+        android:textSize="10sp"
         android:layout_alignParentEnd="true"
         android:visibility="visible" />
 

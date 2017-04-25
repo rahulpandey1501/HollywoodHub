@@ -16,6 +16,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,7 +32,7 @@ public class ChatActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private ContentLoadingProgressBar progressBar;
     private FirebaseRecyclerAdapter mFirebaseAdapter;
-    private boolean isMessageSent = false, firstTimeDataLoaded = false;
+    private boolean firstTimeDataLoaded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,14 +69,14 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void setUpChatAdapter() {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("group_chat");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("group_chat").orderByChild("time").getRef();
         mFirebaseAdapter = new FirebaseRecyclerAdapter<ChatModel, ChatRecyclerViewHolder>
                 (ChatModel.class, R.layout.chat_item_layout, ChatRecyclerViewHolder.class, ref) {
 
             @Override
             protected void populateViewHolder(ChatRecyclerViewHolder viewHolder, ChatModel model, int position) {
                 if (model.getuID().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-                    viewHolder.bindChatView(model, false);
+                    viewHolder.bindChatView(model, true);
                 } else {
                     viewHolder.bindChatView(model, false);
                 }
@@ -84,12 +85,12 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             protected void onDataChanged() {
                 super.onDataChanged();
-                if (!firstTimeDataLoaded) {
-                    firstTimeDataLoaded = true;
-                    hideProgressBar();
-                }
-                if (isMessageSent) {
+                if (firstTimeDataLoaded) {
                     scrollToLastPosition(mFirebaseAdapter.getItemCount()-1);
+                }
+                else {
+                    hideProgressBar();
+                    firstTimeDataLoaded = true;
                 }
             }
         };
@@ -103,7 +104,6 @@ public class ChatActivity extends AppCompatActivity {
 
     private void scrollToLastPosition(final int position) {
         mRecyclerView.scrollToPosition(position);
-        isMessageSent = false;
     }
 
     private void bindViews() {
@@ -128,6 +128,11 @@ public class ChatActivity extends AppCompatActivity {
 
     private void sendMessage(String message) {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "Some error occurred. Please signout and signin again", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
         String image = (currentUser.getPhotoUrl() != null) ? currentUser.getPhotoUrl().toString() : null;
         FirebaseDatabase.getInstance()
                 .getReference()
@@ -138,7 +143,6 @@ public class ChatActivity extends AppCompatActivity {
                         image,
                         currentUser.getUid()));
         messageET.setText("");
-        isMessageSent = true;
     }
 
     @Override

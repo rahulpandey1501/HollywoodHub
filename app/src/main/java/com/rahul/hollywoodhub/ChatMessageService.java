@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -24,7 +25,8 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class ChatMessageService extends Service{
 
-    private DatabaseReference reference;
+    final int NOTIFICATION_ID = 0;
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -43,7 +45,7 @@ public class ChatMessageService extends Service{
     }
 
     private void setFirebaseDBListeners() {
-        reference = FirebaseDatabase.getInstance().getReference("group_chat");
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("group_chat");
         reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -97,8 +99,15 @@ public class ChatMessageService extends Service{
                 .setAutoCancel(false)
                 .setSound(defaultSoundUri)
                 .setPriority(Notification.PRIORITY_HIGH)
+                .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+    }
+
+    public void clearNotification() {
+        NotificationManager notificationManager = (NotificationManager) this
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(NOTIFICATION_ID);
     }
 }

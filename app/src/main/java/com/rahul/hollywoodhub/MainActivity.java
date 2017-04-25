@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.DataSetObserver;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
@@ -178,13 +179,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        ((SwitchCompat)navigationView.getMenu().findItem(R.id.chat_notification_switch).getActionView())
-                .setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        SwitchCompat notificationSwitch = (SwitchCompat)navigationView.getMenu()
+                .findItem(R.id.chat_notification_switch).getActionView();
+        notificationSwitch.setChecked(PreferenceManager.getDefaultSharedPreferences(this)
+                                            .getBoolean("chat_notification_enable", true));
+        notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
                         .edit().putBoolean("chat_notification_enable", isChecked).apply();
-                Log.d("chat", isChecked+"");
             }
         });
         setHeaderImage(fromMoviePage);
@@ -206,7 +209,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private void setViewPagerAdapter(String item, boolean fromSearch) {
         mTabPagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), item, fromSearch);
-        mTabLayout.setTabsFromPagerAdapter(mTabPagerAdapter);
         mViewPager.setAdapter(mTabPagerAdapter);
         mTabLayout.setupWithViewPager(mViewPager);
     }

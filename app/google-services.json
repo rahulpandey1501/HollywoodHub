@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "831604468315",
+    "firebase_url": "https://hollywoodhub-98d81.firebaseio.com",
+    "project_id": "hollywoodhub-98d81",
+    "storage_bucket": "hollywoodhub-98d81.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:831604468315:android:e233fe89213b6b9b",
+        "android_client_info": {
+          "package_name": "com.rahul.hollywoodhub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "831604468315-sila7moug6jji03d6qscpgaei6rovm1u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rahul.hollywoodhub",
+            "certificate_hash": "de5b781d8822e9e7282506b019951d09c0e66b04"
+          }
+        },
+        {
+          "client_id": "831604468315-kvlkrprhpvb5nqi80caho9c9c7culhg8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rahul.hollywoodhub",
+            "certificate_hash": "595d6d06fe1ff46ba28bff377bac31685bcab391"
+          }
+        },
+        {
+          "client_id": "831604468315-sgqcl2v69tvs99hrgh3bdfditdidstqv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzmvozC4Ww4ePir_XgHbOr03mUTWEFDmo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "831604468315-sgqcl2v69tvs99hrgh3bdfditdidstqv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
